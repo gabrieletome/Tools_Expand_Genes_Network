@@ -4,6 +4,3 @@ Lists/
 Lists_Human/
 __pycache__/
 lib/__pycache__/
-import_doc/hgnc_cc_zero_filtered_mat.csv
-import_doc/tcga_prad_mat_z.csv
-import_doc/vv_exprdata_2.csv
