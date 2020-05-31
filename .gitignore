@@ -3,3 +3,5 @@ networkOutput/
 example_lists/Info_Lists_Human/
 __pycache__/
 lib/__pycache__/
+.gitignore
+.gitattributes
