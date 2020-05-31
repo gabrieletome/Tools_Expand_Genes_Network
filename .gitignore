@@ -1,6 +1,5 @@
 commonGenesOutput/
 networkOutput/
-Lists/
-Lists_Human/
+example_lists/Info_Lists_Human/
 __pycache__/
 lib/__pycache__/
