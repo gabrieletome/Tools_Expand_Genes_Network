@@ -1,5 +1,0 @@
-# Auto detect text files and perform LF normalization
-* text=auto
-import_doc/hgnc_cc_zero_filtered_mat.csv filter=lfs diff=lfs merge=lfs -text
-import_doc/tcga_prad_mat_z.csv filter=lfs diff=lfs merge=lfs -text
-import_doc/vv_exprdata_2.csv filter=lfs diff=lfs merge=lfs -text
