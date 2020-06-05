@@ -134,16 +134,19 @@ def printNumberVenn(listCommonGenes, nameDir):
         nameDirGenes = nameDir+nameF+'/'
         f = open(nameDirGenes+'venn_number_'+nameF+'.txt', 'w')
         f.write('---> NUMBER GENES IN \''+nameF+'\': '+str(int(len(listCommonGenes[0][i][1:])/len(listCommonGenes[0][i][0])))+'\n')
-
-        listKey = sorted([(re.findall(r'\w+', u)) for u in listCommonGenes[1][i].keys()], key=len)
-        for key in listKey[:-1]:
+        listKey = sorted([u for u in listCommonGenes[1][i].keys()], key=len)
+        #listKey = sorted([u for u in listCommonGenes[1][i].keys() if len(u.split(',')) == 1], key=len)
+        #listKey = sorted([(re.findall(r'\w+', u)) for u in listCommonGenes[1][i].keys()], key=len)
+        for key in listKey:
             nameFile = ''
-            for g in sorted(key):
-                if nameFile == '':
-                    nameFile = g
-                else:
-                    nameFile += '_'+g
-            f.write('---> NUMBER GENES IN \''+nameFile+'\': '+str(int(len(listCommonGenes[1][i][str(key)])/len(key)))+'\n')
+            for g in sorted(key.split('\'')):
+                if len(g) > 4:
+                    if nameFile == '':
+                        nameFile = g
+                    else:
+                        nameFile += '_'+g
+
+            f.write('---> NUMBER GENES IN \''+nameFile+'\': '+str(int(len(listCommonGenes[1][i][str(key)])/len(nameFile.split('_'))))+'\n')
         f.close()
         print('Create: \''+nameF+'/venn_number_'+nameF+'.txt\'', flush=True)
         i += 1

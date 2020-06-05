@@ -80,18 +80,25 @@ def readFilesGenes(listFiles, coupleGenes, listfilter):
                     elif 'csv' in namefilezip:
                         #Read file csv inside an archive zip
                         csvText = str(archive.read(namefilezip))
-                        csvText = csvText.split(r'"')
+                        if csvText[1] == '"':
+                            csvText = csvText.split(r'"')
+                        else:
+                            csvText = csvText.split('\'')
                         csvListText = []
                         nameGene = ''
                         #different split if is vitis or human
                         if vitis:
                             csvText = csvText[1]
                             csvListText = csvText.split(r'\n')
-                            nameGene = listBioNameUpdate[(csvListText[0].split(r','))[3]]
+                            try:
+                                nameGene = listBioNameUpdate[((csvListText[0].split(r','))[3]).upper()]
+                            except:
+                                listBioNameUpdate[((csvListText[0].split(r','))[3]).upper()] = ((csvListText[0].split(r','))[3]).upper()
+                                nameGene = ((csvListText[0].split(r','))[3]).upper()
                         else:
                             csvText = csvText[0]
                             csvListText = csvText.split(r'\n')
-                            nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
+                            nameGene = (((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]).upper()
                         #if is a gene to analyze read it
                         if nameGene in dictGeneToAnalyze.keys():
                             csvTemp = open(namefilezip, 'w')
@@ -100,7 +107,7 @@ def readFilesGenes(listFiles, coupleGenes, listfilter):
                             csvTemp.close()
                             listGenes = []
                             if vitis:
-                                listGenes = vit.readFilesVitis(namefilezip)
+                                listGenes = (ut.readFilesVitis(namefilezip,True))[0]
                             else:
                                 listGenes = utex.readFilesHuman(namefilezip, TCGAdb)
                             os.remove(namefilezip)
@@ -235,16 +242,16 @@ def updateNameVitis():
     for l in listLineName:
         if l[3] != '':
             if l[3] not in listBioNameUpdate.values():
-                listBioNameUpdate[l[0]] = l[3]
+                listBioNameUpdate[l[0].upper()] = l[3]
             else:
-                listBioNameUpdate[l[0]] = l[3]+'_'+l[0]
+                listBioNameUpdate[l[0].upper()] = l[3]+'_'+l[0].upper()
         elif l[2] != '':
             if l[2] not in listBioNameUpdate.values():
-                listBioNameUpdate[l[0]] = l[2]
+                listBioNameUpdate[l[0].upper()] = l[2]
             else:
-                listBioNameUpdate[l[0]] = l[2]+'_'+l[0]
+                listBioNameUpdate[l[0].upper()] = l[2]+'_'+l[0].upper()
         else:
-            listBioNameUpdate[l[0]] = l[0]
+            listBioNameUpdate[l[0].upper()] = l[0].upper()
 
 #Main function
 def main():
@@ -284,7 +291,10 @@ def main():
                         l[0] = listBioNameUpdate[l[0]]
                         i = 1
                         while i < len(l):
-                            l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
+                            try:
+                                l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
+                            except:
+                                pass
                             i += 1
                 #find common genes
                 listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
@@ -356,7 +366,7 @@ def main():
 
                 #Calculating pearson correlation for each edge
                 print('Calculating Pearson correlation '+str(utex.buildNamefile(l))+'...')
-                if vitis:
+                if vitis: #TODO: manage Pearson Correlation if expansion with GT-001
                     listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:]]
                     tmp = ut.pearsonCorrelation(listForPearson, 'vv_exprdata_2.csv')
                     pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]
