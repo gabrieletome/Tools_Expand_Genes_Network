@@ -393,23 +393,27 @@ def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, auto
 #Draw Venn Diagram of common genes
 def printVenn(listForVenn, couples, nameDir):
     for k in listForVenn:
-        listKey = sorted([(re.findall(r'\w+', u)) for u in k.keys()], key=len)
+        listKey = sorted([u for u in k.keys()], key=len)
         nameF = ''
-        for g in sorted([u for u in listKey if len(u) == 1]):
+        for g in sorted([u for u in listKey if len(u.split(',')) == 1]):
             if nameF == '':
-                nameF = g[0]
+                nameF = g.split('\'')[1]
             else:
-                nameF += '_'+g[0]
+                nameF += '_'+g.split('\'')[1]
         #Print .csv for each combination of genes of LGN. They contain the list of genes associated to that combination
-        for key in listKey[:-1]:
+        #FIX
+        for key in listKey:
             nameFile = ''
-            for g in sorted(key):
-                if nameFile == '':
-                    nameFile = g
-                else:
-                    nameFile += '_'+g
+            for g in sorted(key.split('\'')):
+                if len(g) > 4:
+                    if nameFile == '':
+                        nameFile = g
+                    else:
+                        nameFile += '_'+g
+
             f = open(nameDir+nameF+'/'+nameFile+'.csv', 'w')
             f.write(nameFile+'\n')
+            #print(k)
             for elem in k[str(key)]:
                 f.write(str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n')
             f.close()
@@ -566,11 +570,11 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
                 # Plot when we have data
                 if counter < len(listFrel):
                     #Draw histogram with log10 axes
-                    ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, log=True, edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' shared genes'])
+                    ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' shared genes'])
                     # ax.hist(frelOriginalFile[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='green', alpha=0.5, label='{}'.format(listFrel[counter][0]))
                     # ax.hist(listFrel[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='blue', alpha=0.5, label='{}'.format(listFrel[counter][0]))
                     ax.set_xlabel('Frequency')
-                    ax.set_ylabel('Number common genes (log10)')
+                    ax.set_ylabel('Number common genes')
                     leg = ax.legend(loc='upper left')
                     leg.draw_frame(False)
                 # Remove axis when we no longer have data

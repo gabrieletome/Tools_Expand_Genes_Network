@@ -15,6 +15,7 @@ list_Genes = []
 #Build list of lists of gene
 #Return a list of lists
 def buildMatrixGenesVitis(listFilter, listFiles):
+    global list_Genes
     matrixGenes = []
     extensionFiles = listFiles[0][-4:]
     for f in listFiles:
@@ -34,7 +35,9 @@ def buildMatrixGenesVitis(listFilter, listFiles):
                     for l in csvListText:
                         csvTemp.write(l+'\n')
                     csvTemp.close()
-                    listGenes = readFilesVitis(namefilezip)
+                    listGenes = ut.readFilesVitis(namefilezip, True)
+                    list_Genes = listGenes[1]
+                    listGenes = listGenes[0]
                     os.remove(namefilezip)
                     #Filter lists
                     for filter in listFilter:
@@ -42,7 +45,9 @@ def buildMatrixGenesVitis(listFilter, listFiles):
                     matrixGenes.append(listGenes)
             else:
                 #Read gene files .csv
-                listGenes = readFilesVitis(f)
+                listGenes = ut.readFilesVitis(namefilezip, True)
+                list_Genes = listGenes[1]
+                listGenes = listGenes[0]
                 #Filter lists
                 for filter in listFilter:
                     listGenes = applyFilter(listGenes, filter)
@@ -74,39 +79,6 @@ def applyFilter(listGenes, filter):
         ut.printInfo()
     return listGenes
 
-#Read file .csv
-#Return list of tuples with position [0] name of the gene, in pos 2+ all gene associated
-def readFilesVitis(filename):
-    print('Open file: '+filename, flush=True)
-    try:
-        f = open(filename, 'rU')
-        text = f.read()
-        f.close()
-    except:
-        #except if file does not exist
-        print('ERROR: FILE NOT FOUND. File \''+filename+'\' does not exist')
-        sys.exit(-1)
-    #split rows
-    listLine = text.split('\n')
-    #split column based on symbol ','
-    listCells = []
-    for line in listLine:
-        listCells.append(line.split(','))
-    #Name of the gene is in cell in row 0, column 3
-    nameGene = listCells[0][3]
-    #add at list of genes
-    list_Genes.append(nameGene)
-    listTuples = [nameGene]
-    for i in listCells:
-        if len(i) > 4:
-            try:
-                #add new tuple: (rank, node, Frel, functional-annotation, network1)
-                #possible add more parameters
-                tuple = (int(i[0]), i[1], float(i[3]), i[4], i[7])
-                listTuples.append(tuple)
-            except:
-                pass
-    return listTuples
 
 #Print in output the graphs
 def printOutput(coreGraph, graphGenes):
@@ -134,19 +106,19 @@ def printOutput(coreGraph, graphGenes):
     listBioNameUpdate = {}
     for l in listLineName:
         if l[3] != '':
-            listBioNameUpdate[l[0]] = l[3]
+            listBioNameUpdate[l[0].upper()] = l[3]
         elif l[2] != '':
-            listBioNameUpdate[l[0]] = l[2]
+            listBioNameUpdate[l[0].upper()] = l[2]
         else:
-            listBioNameUpdate[l[0]] = l[0]
+            listBioNameUpdate[l[0].upper()] = l[0].upper()
         for n in list_Genes:
-            if n == l[0]:
+            if n == l[0].upper():
                 if l[3] != '':
                     list_Genes[list_Genes.index(n)] = l[3]
                 elif l[2] != '':
                     list_Genes[list_Genes.index(n)] = l[2]
                 else:
-                    list_Genes[list_Genes.index(n)] = l[0]
+                    list_Genes[list_Genes.index(n)] = l[0].upper()
     f.close()
     #update name of genes
     i = 0

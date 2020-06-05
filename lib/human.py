@@ -9,6 +9,7 @@ import zipfile
 import lib.filters as filters
 import lib.graphic as graphic
 import lib.utilities as ut
+import lib.vitis as vit
 
 autoSaveImg = False
 ignoreEdgesIsoform = False
@@ -21,6 +22,7 @@ listBioNameUpdate = {}
 #Build list of lists of gene
 #Return a list of lists
 def buildMatrixGenesHuman(listFilter, listFiles, fantom):
+    global list_Genes
     global typeDB
     typeDB = fantom
     #BUILD MATRIX OF GENES
@@ -45,7 +47,9 @@ def buildMatrixGenesHuman(listFilter, listFiles, fantom):
                                 for l in csvListText:
                                     csvTemp.write(l+'\n')
                                 csvTemp.close()
-                                listGenes = readFilesHuman(namefilesubzip)
+                                listGenes = ut.readFilesVitis(namefilesubzip, False)
+                                list_Genes = listGenes[1]
+                                listGenes = listGenes[0]
                                 os.remove(namefilesubzip)
                                 #Filter lists
                                 for filter in listFilter:
@@ -53,14 +57,39 @@ def buildMatrixGenesHuman(listFilter, listFiles, fantom):
                                 matrixGenes.append(listGenes)
                     elif 'expansion' in namefilezip:
                         csvText = str(archive.read(namefilezip))
-                        csvText = csvText.split(r'"')
+                        if csvText[1] == '"':
+                            csvText = csvText.split(r'"')
+                        else:
+                            csvText = csvText.split('\'')
                         csvText = csvText[0]
                         csvListText = csvText.split(r'\n')
                         csvTemp = open(namefilezip, 'w')
                         for l in csvListText:
                             csvTemp.write(l+'\n')
                         csvTemp.close()
-                        listGenes = readFilesHuman(namefilezip)
+                        listGenes = ut.readFilesVitis(namefilezip, typeDB)
+                        list_Genes = listGenes[1]
+                        listGenes = listGenes[0]
+                        os.remove(namefilezip)
+                        #Filter lists
+                        for filter in listFilter:
+                            listGenes = applyFilter(listGenes, filter)
+                        matrixGenes.append(listGenes)
+                    elif 'csv' in namefilezip:
+                        csvText = str(archive.read(namefilezip))
+                        if csvText[1] == '"':
+                            csvText = csvText.split(r'"')
+                        else:
+                            csvText = csvText.split('\'')
+                        csvText = csvText[1]
+                        csvListText = csvText.split(r'\n')
+                        csvTemp = open(namefilezip, 'w')
+                        for l in csvListText:
+                            csvTemp.write(l+'\n')
+                        csvTemp.close()
+                        listGenes = ut.readFilesVitis(namefilezip, typeDB)
+                        list_Genes = listGenes[1]
+                        listGenes = listGenes[0]
                         os.remove(namefilezip)
                         #Filter lists
                         for filter in listFilter:
@@ -68,7 +97,9 @@ def buildMatrixGenesHuman(listFilter, listFiles, fantom):
                         matrixGenes.append(listGenes)
             else:
                 #Read gene files .csv
-                listGenes = readFilesHuman(f)
+                listGenes = ut.readFilesVitis(f, typeDB)
+                list_Genes = listGenes[1]
+                listGenes = listGenes[0]
                 #Filter lists
                 for filter in listFilter:
                     listGenes = applyFilter(listGenes, filter)
@@ -182,40 +213,41 @@ def applyFilter(listGenes, filter):
 
 #Read file .csv
 #Return list of tuples with position [0] name of the gene, in pos 2+ all gene associated
-def readFilesHuman(filename):
-    print('Open file: '+filename, flush=True)
-    try:
-        f = open(filename, 'rU')
-        text = f.read()
-        f.close()
-    except:
-        #except if file does not exist
-        print('ERROR: FILE NOT FOUND. File \''+filename+'\' does not exist')
-        sys.exit(-1)
-    #split rows
-    listLine = text.split('\n')
-    #split column based on symbol ','
-    listCells = []
-    for line in listLine:
-        listCells.append(line.split(','))
-    #Name of the gene is in cell in row 0, column 3
-    if typeDB:
-        nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[0]) #FANTOM
-    else:
-        nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[1])  #TCGA
-    #add at list of genes
-    list_Genes.append(nameGene.upper())
-    listTuples = [nameGene.upper()]
-    for i in listCells:
-        if len(i) > 4:
-            try:
-                #add new tuple: (rank, node, Frel)
-                #possible add more parameters
-                tuple = (int(i[0]), i[1].upper(), float(i[3]))
-                listTuples.append(tuple)
-            except:
-                pass
-    return listTuples
+# def readFilesHuman(filename):
+#     print('Open file: '+filename, flush=True)
+#     try:
+#         f = open(filename, 'rU')
+#         text = f.read()
+#         f.close()
+#     except:
+#         #except if file does not exist
+#         print('ERROR: FILE NOT FOUND. File \''+filename+'\' does not exist')
+#         sys.exit(-1)
+#     #split rows
+#     listLine = text.split('\n')
+#     #split column based on symbol ','
+#     listCells = []
+#     for line in listLine:
+#         listCells.append(line.split(','))
+#     #Name of the gene is in cell in row 0, column 3
+#     if typeDB:
+#         #nameGene = (listCells[0][3].split('-'))[0]
+#         nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[0]) #FANTOM
+#     else:
+#         nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[1])  #TCGA
+#     #add at list of genes
+#     list_Genes.append(nameGene.upper())
+#     listTuples = [nameGene.upper()]
+#     for i in listCells:
+#         if not len(i) < 5:
+#             try:
+#                 #add new tuple: (rank, node, Frel)
+#                 #possible add more parameters
+#                 tuple = (int(i[0]), i[1].upper(), float(i[3]))
+#                 listTuples.append(tuple)
+#             except:
+#                 pass
+#     return listTuples
 
 #
 def indexDictGene(g, listStr):

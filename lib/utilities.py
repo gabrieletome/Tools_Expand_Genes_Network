@@ -3,6 +3,8 @@ import sys
 import scipy.stats.stats as stat
 import lib.charikarAlgorithm as charikarAlgorithm
 
+list_Genes = []
+
 #Print info about cmd command if the call is wrong
 def printInfo():
     print('Usage: python3 managerList.py PARAM [FILTERS]... -files [FILES]...')
@@ -209,8 +211,8 @@ def pearsonCorrelation(edges, file):
         listLine = line.split(',')
         listLine[-1] = listLine[-1][0:-1]
         for name in listNameGene:
-            if name in listLine[0]:
-                listFloat = [listLine[0]]
+            if name in listLine[0].upper():
+                listFloat = [listLine[0].upper()]
                 for k in listLine[1:]:
                     listFloat.append(float(k))
                 lineCorr.append(listFloat)
@@ -228,6 +230,48 @@ def pearsonCorrelation(edges, file):
             i += 1
         edgeCorrValue.append((line1[0], line2[0], (stat.pearsonr(line1[1:], line2[1:]))[0]))
     return edgeCorrValue
+
+#Read file .csv
+#Return list of tuples with position [0] name of the gene, in pos 2+ all gene associated
+def readFilesVitis(filename, typeDB):
+    print('Open file: '+filename, flush=True)
+    try:
+        f = open(filename, 'rU')
+        text = f.read()
+        f.close()
+    except:
+        #except if file does not exist
+        print('ERROR: FILE NOT FOUND. File \''+filename+'\' does not exist')
+        sys.exit(-1)
+    #split rows
+    listLine = text.split('\n')
+    #split column based on symbol ','
+    listCells = []
+    for line in listLine:
+        listCells.append(line.split(','))
+    #Name of the gene is in cell in row 0, column 3
+    if typeDB:
+        nameGene = (listCells[0][3].split('-'))[0]
+    else:
+        nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[0])  #fantom
+        if nameGene == 'TCGAz':
+            nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[1])  #TCGA
+    #add at list of genes
+    list_Genes.append(nameGene.upper())
+    listTuples = [nameGene.upper()]
+    for i in listCells:
+        if not len(i) < 5:
+            try:
+                #add new tuple: (rank, node, Frel, functional-annotation, network1)
+                #possible add more parameters
+                try:
+                    tuple = (int(i[0]), i[1].upper(), float(i[3]), i[4], i[7])
+                except:
+                    tuple = (int(i[0]), i[1].upper(), float(i[3]))
+                listTuples.append(tuple)
+            except:
+                pass
+    return (listTuples,list_Genes)
 
 
 #print file CSV with edges of graph
