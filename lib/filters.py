@@ -11,6 +11,19 @@ def filterFrel(listGenes, perc):
             newListGenes.append(g)
     return newListGenes
 
+#Apply filter on rank
+#Remove all gene with Frel > rank
+def filterRank(listGenes, rank):
+    newListGenes = []
+    for g in listGenes:
+        try:
+            if g[0] <= rank:
+                newListGenes.append(g)
+        except:
+            #try/except if the line is the first (name gene)
+            newListGenes.append(g)
+    return newListGenes
+
 #Return all tuples with at least one pattern inside 'functional annotation' or  'Network1' columns
 def filterType(listGenes, patterns):
     newListGenes = [listGenes[0]]

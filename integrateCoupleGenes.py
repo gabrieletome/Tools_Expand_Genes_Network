@@ -194,6 +194,9 @@ def readParameters(input):
         elif re.search(r'^-rank$', input[i]):
             typeAnalyze = 1
             rankCut = int(input[i+1])
+            filterParam = (input[i],input[i+1])
+            #add tuple to the list
+            listFilter.append(filterParam)
             i += 2
         elif re.search(r'^-frel$', input[i]):
             typeAnalyze = 0
@@ -311,11 +314,8 @@ def main():
                             i += 1
                 #find common genes
                 listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
-                if typeAnalyze == 0: #frel
-                    print('frel: '+str(min_frel))
-                    edgesGraph = utex.edgesFrel(listCouple, listFiles)
-                elif typeAnalyze == 1: #rank
-                    print('RANK top: '+str(rankCut))
+                if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
+                    edgesGraph = utex.buildEdgesFrelRank(listCouple, listFiles)
                 elif typeAnalyze == 2: #shared
                     edgesGraph = listCommonGenes[0]
             else:
@@ -330,13 +330,12 @@ def main():
                         i += 1
                 #read which isoforms compone the edges
                 isoformInEdge = utex.readFiles(cmd[0][-1])
-                if typeAnalyze == 0: #frel
-                    print('frel:'+str(min_frel))
-                elif typeAnalyze == 1: #rank
-                    print('RANK top:'+str(rankCut))
+                #find common genes
+                listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
+                if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
+                    edgesGraph = utex.buildEdgesFrelRankIsoform(listCouple, listFiles, isoformInEdge)
                 elif typeAnalyze == 2:
-                    #find common genes
-                    listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
+                    edgesGraph = listCommonGenes[0]
 
             #print CSV with genes share between every gene of LGN
             printCSV(edgesGraph)

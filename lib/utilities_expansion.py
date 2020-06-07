@@ -45,6 +45,8 @@ def buildNamefile(l):
 def applyFilter(listGenes, filter):
     if filter[0] == '-f' and len(filter) == 2:
         listGenes = filters.filterFrel(listGenes, float(filter[1]))
+    elif filter[0] == '-rank' and len(filter) == 2:
+        listGenes = filters.filterRank(listGenes, int(filter[1]))
     elif (filter[0] == '-a' or filter[0] == '-c') and len(filter) >= 1:
         #already managed
         pass
@@ -186,7 +188,7 @@ def manageDuplicates(completeGraph):
     return minGraph
 
 #Function for sorted list
-def ord(tuple):
+def ord2(tuple):
     return tuple[2]
 
 #Find common genes in lists of genes
@@ -266,7 +268,7 @@ def findCommonGenes(couples, listFiles):
                             pass
                 i+=1
         listForVenn.append(innerListForVenn)
-        innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord)
+        innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord2)
         listCommonGenes.append(innerListGenes)
 
     return (listCommonGenes, listForVenn)
@@ -370,12 +372,12 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
                                 pass
                     i+=1
             listForVenn.append(innerListForVenn)
-            innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord)
+            innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord2)
             listCommonGenes.append(innerListGenes)
     return (listCommonGenes, listForVenn)
 
-#
-def edgesFrel(listCouple, listFiles):
+#Build Edges for frel and rank
+def buildEdgesFrelRank(listCouple, listFiles):
     listsEdges = []
     for lgn in listCouple:
         innerListEdges = [lgn]
@@ -386,7 +388,43 @@ def edgesFrel(listCouple, listFiles):
         listsEdges.append(innerListEdges)
     return listsEdges
 
-#
+#Build Edges for frel and rank
+def buildEdgesFrelRankIsoform(listCouple, listFiles, isoformInEdge):
+    listsEdges = []
+    for c in listCouple:
+        #find isoform we need to use
+        edgesNodes = [(u[0], u[1]) for u in isoformInEdge]
+        i = 0
+        j = 1
+        isoformToSearch = []
+        numberEdgesBetweenGeneCouple = 0
+        while i < len(c):
+            numberEdgesBetweenGeneCouple += len(c)-i-1
+            while j < len(c):
+                if (c[i], c[j]) in edgesNodes:
+                    isoformToSearch.append((isoformInEdge[edgesNodes.index((c[i], c[j]))])[2:])
+                if (c[j], c[i]) in edgesNodes:
+                    isoformToSearch.append((isoformInEdge[edgesNodes.index((c[j], c[i]))])[2:])
+                j += 1
+            i += 1
+            j = i+1
+        listNameIsoform = {}
+        #save name isoform of lists in a dictionary to improve the performance
+        for l in isoformToSearch:
+            for n in l:
+                tmpIsoform = n.split('-')
+                for iso in tmpIsoform:
+                    listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
+        #TODO FIX
+        innerListEdges = [c]
+        for l in listFiles:
+            if l[0] in listNameIsoform.keys():
+                for genes in l[1:]:
+                    innerListEdges.append((listNameIsoform[l[0]], genes[0], genes[1], genes[2]))
+        listsEdges.append(innerListEdges)
+    return listsEdges
+
+#Manage line with multiple genes
 def manageBR(l):
     for u in l[1:]:
         if '<BR>' in u[1]:
