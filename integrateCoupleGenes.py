@@ -17,6 +17,8 @@ vitis = False
 autoSaveImg = False
 completeGraph = False
 min_frel = 0
+typeAnalyze = -1 # 0 = frel, 1 = rank, 2 = shared genes
+rankCut = -1 #if typeAnalyze == 1; read the number of genes to read
 nameDir = 'tmpName'
 
 #Manager to read and filter files
@@ -144,6 +146,10 @@ def readFilesGenes(listFiles, coupleGenes, listfilter):
 #Read gene list name files
 #Return list of files
 def readParameters(input):
+    global typeAnalyze
+    global vitis
+    global TCGAdb
+    global rankCut
     listFiles = []
     listFilter = []
     i = 1
@@ -173,7 +179,27 @@ def readParameters(input):
             while i < len(input):
                 listFiles.append(input[i])
                 i += 1
-        elif re.search(r'^-fantom$', input[i]) or re.search(r'^-TCGA$', input[i]) or re.search(r'^-vitis$', input[i]):
+        elif re.search(r'^-fantom$', input[i]):
+            updateNameHuman()
+            TCGAdb = False
+            i += 1
+        elif re.search(r'^-TCGA$', input[i]):
+            updateNameHuman()
+            i += 1
+        elif re.search(r'^-vitis$', input[i]):
+            vitis = True
+            TCGAdb = False
+            updateNameVitis()
+            i += 1
+        elif re.search(r'^-rank$', input[i]):
+            typeAnalyze = 1
+            rankCut = int(input[i+1])
+            i += 2
+        elif re.search(r'^-frel$', input[i]):
+            typeAnalyze = 0
+            i += 1
+        elif re.search(r'^-shared$', input[i]):
+            typeAnalyze = 2
             i += 1
         #if is else, return an error
         else:
@@ -258,21 +284,7 @@ def main():
     if len(sys.argv) >= 2:
         if sys.argv[1] == '--help':
             utex.printInfo()
-        else:
-            #Read first parameter and set the correct boolean to true
-            global TCGAdb
-            if sys.argv[1] == '-fantom':
-                updateNameHuman()
-                TCGAdb = False
-            elif sys.argv[1] == '-TCGA':
-                updateNameHuman()
-            elif sys.argv[1] == '-vitis':
-                global vitis
-                vitis = True
-                TCGAdb = False
-                updateNameVitis()
-            else:
-                print('ERROR: need to specify \'-fantom\' or \'-TCGA\'')
+        elif (sys.argv[1] == '-fantom' or sys.argv[1] == '-TCGA' or sys.argv[1] == '-vitis') and (sys.argv[2] == '-shared' or sys.argv[2] == '-rank' or sys.argv[2] == '-frel'):
             #read parameters
             cmd = readParameters(sys.argv)
             #read each file .csv, read first line, check if is our gene
@@ -282,9 +294,10 @@ def main():
             #find common genes in the lists readed
             listCommonGenes = []
             isoformInEdge = []
+            edgesGraph = []
             if TCGAdb or vitis:
                 #read files if are TCGA or Vitis
-                listFiles = readFilesGenes(cmd[0][1:], listCouple, cmd[1])
+                listFiles = [utex.manageBR(u) for u in readFilesGenes(cmd[0][1:], listCouple, cmd[1])]
                 if vitis:
                     #upload name if is Vitis
                     for l in listFiles:
@@ -298,6 +311,13 @@ def main():
                             i += 1
                 #find common genes
                 listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
+                if typeAnalyze == 0: #frel
+                    print('frel: '+str(min_frel))
+                    edgesGraph = utex.edgesFrel(listCouple, listFiles)
+                elif typeAnalyze == 1: #rank
+                    print('RANK top: '+str(rankCut))
+                elif typeAnalyze == 2: #shared
+                    edgesGraph = listCommonGenes[0]
             else:
                 #read files if is Fantom
                 listFiles = readFilesGenes(cmd[0][1:-1], listCouple, cmd[1])
@@ -310,18 +330,23 @@ def main():
                         i += 1
                 #read which isoforms compone the edges
                 isoformInEdge = utex.readFiles(cmd[0][-1])
-                #find common genes
-                listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
+                if typeAnalyze == 0: #frel
+                    print('frel:'+str(min_frel))
+                elif typeAnalyze == 1: #rank
+                    print('RANK top:'+str(rankCut))
+                elif typeAnalyze == 2:
+                    #find common genes
+                    listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
 
             #print CSV with genes share between every gene of LGN
-            printCSV(listCommonGenes[0])
+            printCSV(edgesGraph)
             #Draw the Venn diagram, Histogram
             utex.printNumberVenn(listCommonGenes, nameDir)
             graphic.printVenn(listCommonGenes[1], listCouple, nameDir)
             graphic.printHistogram(listCommonGenes[0], listFiles, nameDir, TCGAdb or vitis, isoformInEdge)
 
             pearsonComplete = []
-            for l in listCommonGenes[0]:
+            for l in edgesGraph:
                 #Write genes to download and add the edges
                 if completeGraph:
                     #write in a .txt the genes to download
@@ -367,8 +392,13 @@ def main():
                 #Calculating pearson correlation for each edge
                 print('Calculating Pearson correlation '+str(utex.buildNamefile(l))+'...')
                 if vitis: #TODO: manage Pearson Correlation if expansion with GT-001
+                    for u in l[1:]:
+                        try:
+                            (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(u[2])])
+                        except:
+                            print(u)
                     listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:]]
-                    tmp = ut.pearsonCorrelation(listForPearson, 'vv_exprdata_2.csv')
+                    tmp = utex.manageBR(ut.pearsonCorrelation(listForPearson, 'vv_exprdata_2.csv'))
                     pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]
                     pearsonComplete.append(pearson)
                 else:
@@ -378,7 +408,10 @@ def main():
                 print('Pearson Correlation done')
 
             #Draw graph
-            graphic.printCommonGraph(listCommonGenes[0], pearsonComplete, 1-min_frel, nameDir, autoSaveImg)
+            graphic.printCommonGraph(edgesGraph, pearsonComplete, 1-min_frel, nameDir, autoSaveImg)
+        else:
+            print('ERROR: wrong format')
+            utex.printInfo()
 
 #Calls the main() function.
 if __name__ == '__main__':

@@ -4,11 +4,15 @@ import re
 import sys
 #Print info about cmd command if the call is wrong
 def printInfo():
-    print('Usage: python3 integrateCoupleGenes.py PARAM [FILTERS]... -files [GENES] [FILES]... [ISOFORM]')
+    print('Usage: python3 integrateCoupleGenes.py PARAM TYPEA [FILTERS]... -files [GENES] [FILES]... [ISOFORM]')
     print('PARAM:')
     print('\t-vitis\tLists of vitis')
     print('\t-fantom\tLists of fantom DB')
     print('\t-TCGA\tLists of TCGA DB')
+    print('TYPEA:')
+    print('\t-frel\tBuild expansion network based on FREL. Required filter \'-f\'')
+    print('\t-rank [INT]\tBuild expansion network based on RANK. Take top genes')
+    print('\t-shared\tBuild expansion network based on SHARED GENES.')
     print('FILTERS:')
     print('\t-a\t\t\tAutosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS')
     print('\t-c\t\t\tAdd edges between associated genes')
@@ -369,3 +373,29 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
             innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord)
             listCommonGenes.append(innerListGenes)
     return (listCommonGenes, listForVenn)
+
+#
+def edgesFrel(listCouple, listFiles):
+    listsEdges = []
+    for lgn in listCouple:
+        innerListEdges = [lgn]
+        for l in listFiles:
+            if l[0] in lgn:
+                for genes in l[1:]:
+                    innerListEdges.append((l[0], genes[0], genes[1], genes[2]))
+        listsEdges.append(innerListEdges)
+    return listsEdges
+
+#
+def manageBR(l):
+    for u in l[1:]:
+        if '<BR>' in u[1]:
+            names = u[1].split('<BR>')
+            tmp = list(u)
+            tmp[1] = names[0]
+            l[l.index(u)] = tuple(tmp)
+            for name in names[1:]:
+                tmp = list(u)
+                tmp[1] = name
+                l.append(tuple(tmp))
+    return l
