@@ -2,6 +2,10 @@ import lib.utilities as ut
 import lib.filters as filters
 import re
 import sys
+import zipfile
+from io import BytesIO
+import os
+
 #Print info about cmd command if the call is wrong
 def printInfo():
     print('Usage: python3 integrateCoupleGenes.py PARAM TYPEA [FILTERS]... -files [GENES] [FILES]... [ISOFORM]')
@@ -16,11 +20,125 @@ def printInfo():
     print('FILTERS:')
     print('\t-a\t\t\tAutosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS')
     print('\t-c\t\t\tAdd edges between associated genes')
+    print('\t-e\t\t\tPrint Venn Diagram and Histogram for complete analysis')
     print('\t-f [NUMBER]\t\tIgnored genes with frel<=NUMBER')
     print('GENES: file .csv with the genes to analyze. Example: \'CoupleGeneToIntegrate/coupleGene.csv\'')
     print('FILES can be a list of .csv or .zip')
     print('ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene.\n\tTo use only with \'-fantom\'')
     sys.exit(-1)
+
+#Manager to read and filter files
+def readFilesGenes(listFiles, coupleGenes, listfilter, vitis, TCGAdb, listBioNameUpdate):
+    dictGeneToAnalyze = {}
+    #Read only file of a gene to analyze
+    for f in coupleGenes:
+        for elem in f:
+            dictGeneToAnalyze[elem] = 0
+    matrixGenes = []
+    extensionFiles = listFiles[0][-4:]
+    for f in listFiles:
+        if f[-4:] == extensionFiles and (f[-4:] != '.csv' or f[-4:] != '.zip'):
+            if f[-4:] == '.zip':
+                archive = zipfile.ZipFile(f, 'r')
+                fileArchive = archive.namelist()
+                for namefilezip in fileArchive:
+                    if '.zip' in namefilezip:
+                        #Read if is a subzip
+                        subarchive = zipfile.ZipFile(BytesIO(archive.read(namefilezip)), 'r')
+                        fileSubArchive = subarchive.namelist()
+                        for namefilesubzip in fileSubArchive:
+                            if 'expansion' in namefilesubzip:
+                                csvText = str(subarchive.read(namefilesubzip))
+                                csvText = csvText.split(r'"')
+                                csvText = csvText[0]
+                                csvListText = csvText.split(r'\n')
+                                nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
+                                if nameGene in dictGeneToAnalyze.keys():
+                                    csvTemp = open(namefilesubzip, 'w')
+                                    for l in csvListText:
+                                        csvTemp.write(l+'\n')
+                                    csvTemp.close()
+                                    listGenes = readFilesHuman(namefilesubzip, TCGAdb)
+                                    os.remove(namefilesubzip)
+                                    # #Filter lists
+                                    for filter in listfilter:
+                                        listGenes = applyFilter(listGenes, filter)
+                                    matrixGenes.append(listGenes)
+                    elif 'expansion' in namefilezip:
+                        #Read if is a list of human
+                        csvText = str(archive.read(namefilezip))
+                        csvText = csvText.split(r'"')
+                        csvText = csvText[0]
+                        csvListText = csvText.split(r'\n')
+                        nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
+                        if nameGene in dictGeneToAnalyze.keys():
+                            csvTemp = open(namefilezip, 'w')
+                            for l in csvListText:
+                                csvTemp.write(l+'\n')
+                            csvTemp.close()
+                            listGenes = readFilesHuman(namefilezip, TCGAdb)
+                            os.remove(namefilezip)
+                            #Filter lists
+                            for filter in listfilter:
+                                listGenes = applyFilter(listGenes, filter)
+                            matrixGenes.append(listGenes)
+                    elif 'csv' in namefilezip:
+                        #Read file csv inside an archive zip
+                        csvText = str(archive.read(namefilezip))
+                        if csvText[1] == '"':
+                            csvText = csvText.split(r'"')
+                        else:
+                            csvText = csvText.split('\'')
+                        csvListText = []
+                        nameGene = ''
+                        #different split if is vitis or human
+                        if vitis:
+                            csvText = csvText[1]
+                            csvListText = csvText.split(r'\n')
+                            try:
+                                nameGene = listBioNameUpdate[((csvListText[0].split(r','))[3]).upper()]
+                            except:
+                                listBioNameUpdate[((csvListText[0].split(r','))[3]).upper()] = ((csvListText[0].split(r','))[3]).upper()
+                                nameGene = ((csvListText[0].split(r','))[3]).upper()
+                        else:
+                            csvText = csvText[0]
+                            csvListText = csvText.split(r'\n')
+                            nameGene = (((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]).upper()
+                        #if is a gene to analyze read it
+                        if nameGene in dictGeneToAnalyze.keys():
+                            csvTemp = open(namefilezip, 'w')
+                            for l in csvListText:
+                                csvTemp.write(l+'\n')
+                            csvTemp.close()
+                            listGenes = []
+                            if vitis:
+                                listGenes = (ut.readFilesVitis(namefilezip,True))[0]
+                            else:
+                                listGenes = readFilesHuman(namefilezip, TCGAdb)
+                            os.remove(namefilezip)
+                            # #Filter lists
+                            for filter in listfilter:
+                                listGenes = applyFilter(listGenes, filter)
+                            matrixGenes.append(listGenes)
+            else:
+                #Read gene files .csv
+                fileRead = open(f, 'r')
+                csvText = fileRead.read()
+                csvText = csvText.split(r'"')
+                csvText = csvText[0]
+                csvListText = csvText.split(r'\n')
+                nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
+                if nameGene in dictGeneToAnalyze.keys():
+                    listGenes = readFilesHuman(f, TCGAdb)
+                    #Filter lists
+                    for filter in listfilter:
+                        listGenes = applyFilter(listGenes, filter)
+                    matrixGenes.append(listGenes)
+        else:
+            print('ERROR: FILES HAVE DIFFERENT EXTENSION. File need to have the same extension. All .csv or all .zip')
+            sys.exit(-1)
+
+    return matrixGenes
 
 #Create edges list of common genes
 # (a, b, c, d) --> (a, c, d)
@@ -47,7 +165,7 @@ def applyFilter(listGenes, filter):
         listGenes = filters.filterFrel(listGenes, float(filter[1]))
     elif filter[0] == '-rank' and len(filter) == 2:
         listGenes = filters.filterRank(listGenes, int(filter[1]))
-    elif (filter[0] == '-a' or filter[0] == '-c') and len(filter) >= 1:
+    elif (filter[0] == '-a' or filter[0] == '-c' or filter[0] == '-e') and len(filter) >= 1:
         #already managed
         pass
     else:

@@ -1,7 +1,5 @@
 import sys
 import re
-import zipfile
-from io import BytesIO
 import os
 import datetime as dt
 import lib.vitis as vit
@@ -16,132 +14,12 @@ TCGAdb = True
 vitis = False
 autoSaveImg = False
 completeGraph = False
-min_frel = 0
+printDiagram = False
+min_frel = 0.1 #default cut frel at 0.1
 typeAnalyze = -1 # 0 = frel, 1 = rank, 2 = shared genes
 rankCut = -1 #if typeAnalyze == 1; read the number of genes to read
 nameDir = 'tmpName'
 
-#Manager to read and filter files
-def readFilesGenes(listFiles, coupleGenes, listfilter):
-    global min_frel
-    global autoSaveImg
-    global completeGraph
-    dictGeneToAnalyze = {}
-    #Read only file of a gene to analyze
-    for f in coupleGenes:
-        for elem in f:
-            dictGeneToAnalyze[elem] = 0
-    matrixGenes = []
-    extensionFiles = listFiles[0][-4:]
-    for f in listFiles:
-        if f[-4:] == extensionFiles and (f[-4:] != '.csv' or f[-4:] != '.zip'):
-            if f[-4:] == '.zip':
-                archive = zipfile.ZipFile(f, 'r')
-                fileArchive = archive.namelist()
-                for namefilezip in fileArchive:
-                    if '.zip' in namefilezip:
-                        #Read if is a subzip
-                        subarchive = zipfile.ZipFile(BytesIO(archive.read(namefilezip)), 'r')
-                        fileSubArchive = subarchive.namelist()
-                        for namefilesubzip in fileSubArchive:
-                            if 'expansion' in namefilesubzip:
-                                csvText = str(subarchive.read(namefilesubzip))
-                                csvText = csvText.split(r'"')
-                                csvText = csvText[0]
-                                csvListText = csvText.split(r'\n')
-                                nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
-                                if nameGene in dictGeneToAnalyze.keys():
-                                    csvTemp = open(namefilesubzip, 'w')
-                                    for l in csvListText:
-                                        csvTemp.write(l+'\n')
-                                    csvTemp.close()
-                                    listGenes = utex.readFilesHuman(namefilesubzip, TCGAdb)
-                                    os.remove(namefilesubzip)
-                                    # #Filter lists
-                                    for filter in listfilter:
-                                        listGenes = utex.applyFilter(listGenes, filter)
-                                    matrixGenes.append(listGenes)
-                    elif 'expansion' in namefilezip:
-                        #Read if is a list of human
-                        csvText = str(archive.read(namefilezip))
-                        csvText = csvText.split(r'"')
-                        csvText = csvText[0]
-                        csvListText = csvText.split(r'\n')
-                        nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
-                        if nameGene in dictGeneToAnalyze.keys():
-                            csvTemp = open(namefilezip, 'w')
-                            for l in csvListText:
-                                csvTemp.write(l+'\n')
-                            csvTemp.close()
-                            listGenes = utex.readFilesHuman(namefilezip, TCGAdb)
-                            os.remove(namefilezip)
-                            #Filter lists
-                            for filter in listfilter:
-                                listGenes = utex.applyFilter(listGenes, filter)
-                            matrixGenes.append(listGenes)
-                    elif 'csv' in namefilezip:
-                        #Read file csv inside an archive zip
-                        csvText = str(archive.read(namefilezip))
-                        if csvText[1] == '"':
-                            csvText = csvText.split(r'"')
-                        else:
-                            csvText = csvText.split('\'')
-                        csvListText = []
-                        nameGene = ''
-                        #different split if is vitis or human
-                        if vitis:
-                            csvText = csvText[1]
-                            csvListText = csvText.split(r'\n')
-                            try:
-                                nameGene = listBioNameUpdate[((csvListText[0].split(r','))[3]).upper()]
-                            except:
-                                listBioNameUpdate[((csvListText[0].split(r','))[3]).upper()] = ((csvListText[0].split(r','))[3]).upper()
-                                nameGene = ((csvListText[0].split(r','))[3]).upper()
-                        else:
-                            csvText = csvText[0]
-                            csvListText = csvText.split(r'\n')
-                            nameGene = (((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]).upper()
-                        #if is a gene to analyze read it
-                        if nameGene in dictGeneToAnalyze.keys():
-                            csvTemp = open(namefilezip, 'w')
-                            for l in csvListText:
-                                csvTemp.write(l+'\n')
-                            csvTemp.close()
-                            listGenes = []
-                            if vitis:
-                                listGenes = (ut.readFilesVitis(namefilezip,True))[0]
-                            else:
-                                listGenes = utex.readFilesHuman(namefilezip, TCGAdb)
-                            os.remove(namefilezip)
-                            # #Filter lists
-                            for filter in listfilter:
-                                listGenes = utex.applyFilter(listGenes, filter)
-                            matrixGenes.append(listGenes)
-            else:
-                #Read gene files .csv
-                fileRead = open(f, 'r')
-                csvText = fileRead.read()
-                csvText = csvText.split(r'"')
-                csvText = csvText[0]
-                csvListText = csvText.split(r'\n')
-                nameGene = ((re.search(r'-\w*\s', csvListText[0])).group())[1:-1]
-                if nameGene in dictGeneToAnalyze.keys():
-                    listGenes = utex.readFilesHuman(f, TCGAdb)
-                    #Filter lists
-                    for filter in listfilter:
-                        listGenes = utex.applyFilter(listGenes, filter)
-                    matrixGenes.append(listGenes)
-        else:
-            print('ERROR: FILES HAVE DIFFERENT EXTENSION. File need to have the same extension. All .csv or all .zip')
-            sys.exit(-1)
-    for f in listfilter:
-        if f[0] == '-f':
-            min_frel = float(f[1])
-        elif f[0] == '-a':
-            autoSaveImg = True
-        elif f[0] == '-c':
-            completeGraph = True
-    return matrixGenes
 
 #Read gene list name files
 #Return list of files
@@ -166,7 +44,7 @@ def readParameters(input):
                 else:
                     filterParam = filterParam + (input[i],)
                     i += 1
-            if filterParam[0] == input[i-1] and (filterParam[0] != '-a' and filterParam[0] != '-c'):
+            if filterParam[0] == input[i-1] and (filterParam[0] != '-a' and filterParam[0] != '-c' and filterParam[0] != '-e'):
                 #return an error if the filter has zero parameters and is not '-a'
                 print('ERROR: incorrect number of parameters')
                 printInfo()
@@ -290,6 +168,19 @@ def main():
         elif (sys.argv[1] == '-fantom' or sys.argv[1] == '-TCGA' or sys.argv[1] == '-vitis') and (sys.argv[2] == '-shared' or sys.argv[2] == '-rank' or sys.argv[2] == '-frel'):
             #read parameters
             cmd = readParameters(sys.argv)
+            for f in cmd[1]:
+                if f[0] == '-f':
+                    global min_frel
+                    min_frel = float(f[1])
+                elif f[0] == '-a':
+                    global autoSaveImg
+                    autoSaveImg = True
+                elif f[0] == '-c':
+                    global completeGraph
+                    completeGraph = True
+                elif f[0] == '-e':
+                    global printDiagram
+                    printDiagram = True
             #read each file .csv, read first line, check if is our gene
             #If YES -> go further, If NO -> check next file
             #When we have read all expansion of all gene, manage lists
@@ -300,7 +191,7 @@ def main():
             edgesGraph = []
             if TCGAdb or vitis:
                 #read files if are TCGA or Vitis
-                listFiles = [utex.manageBR(u) for u in readFilesGenes(cmd[0][1:], listCouple, cmd[1])]
+                listFiles = [utex.manageBR(u) for u in utex.readFilesGenes(cmd[0][1:], listCouple, cmd[1], vitis, TCGAdb, listBioNameUpdate)]
                 if vitis:
                     #upload name if is Vitis
                     for l in listFiles:
@@ -312,15 +203,16 @@ def main():
                             except:
                                 pass
                             i += 1
-                #find common genes
-                listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
+                if printDiagram or typeAnalyze == 2:
+                    #find common genes
+                    listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
                 if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
                     edgesGraph = utex.buildEdgesFrelRank(listCouple, listFiles)
                 elif typeAnalyze == 2: #shared
                     edgesGraph = listCommonGenes[0]
             else:
                 #read files if is Fantom
-                listFiles = readFilesGenes(cmd[0][1:-1], listCouple, cmd[1])
+                listFiles = utex.readFilesGenes(cmd[0][1:-1], listCouple, cmd[1], vitis, TCGAdb, listBioNameUpdate)
                 #upload name
                 for l in listFiles:
                     l[0] = listBioNameUpdate[l[0]]
@@ -330,8 +222,9 @@ def main():
                         i += 1
                 #read which isoforms compone the edges
                 isoformInEdge = utex.readFiles(cmd[0][-1])
-                #find common genes
-                listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
+                if printDiagram or typeAnalyze == 2:
+                    #find common genes
+                    listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
                 if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
                     edgesGraph = utex.buildEdgesFrelRankIsoform(listCouple, listFiles, isoformInEdge)
                 elif typeAnalyze == 2:
@@ -340,9 +233,32 @@ def main():
             #print CSV with genes share between every gene of LGN
             printCSV(edgesGraph)
             #Draw the Venn diagram, Histogram
-            utex.printNumberVenn(listCommonGenes, nameDir)
-            graphic.printVenn(listCommonGenes[1], listCouple, nameDir)
-            graphic.printHistogram(listCommonGenes[0], listFiles, nameDir, TCGAdb or vitis, isoformInEdge)
+            if printDiagram:
+                utex.printNumberVenn(listCommonGenes, nameDir)
+                graphic.printVenn(listCommonGenes[1], listCouple, nameDir)
+                if TCGAdb or vitis:
+                    textFiles = [utex.manageBR(u) for u in utex.readFilesGenes(cmd[0][1:], listCouple, [('-f',0.1)], vitis, TCGAdb, listBioNameUpdate)]
+                    if vitis:
+                        #upload name if is Vitis
+                        for l in textFiles:
+                            l[0] = listBioNameUpdate[l[0]]
+                            i = 1
+                            while i < len(l):
+                                try:
+                                    l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
+                                except:
+                                    pass
+                                i += 1
+                else:
+                    textFiles = utex.readFilesGenes(cmd[0][1:-1], listCouple, [('-f',0.1)], vitis, TCGAdb, listBioNameUpdate)
+                    #upload name
+                    for l in textFiles:
+                        l[0] = listBioNameUpdate[l[0]]
+                        i = 1
+                        while i < len(l):
+                            l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
+                            i += 1
+                graphic.printHistogram(edgesGraph, textFiles, nameDir, TCGAdb or vitis, isoformInEdge)
 
             pearsonComplete = []
             for l in edgesGraph:

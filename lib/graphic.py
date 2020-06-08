@@ -495,6 +495,7 @@ def printVenn(listForVenn, couples, nameDir):
 
 #Draw histogram graph of common genes
 def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEdge):
+
     for l in listCommonGenes:
         listFrel = []
         for k in l[0]:
@@ -570,11 +571,11 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
                 # Plot when we have data
                 if counter < len(listFrel):
                     #Draw histogram with log10 axes
-                    ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' shared genes'])
+                    ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, range=[0.0, 1.0], edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' analyzed genes'])
                     # ax.hist(frelOriginalFile[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='green', alpha=0.5, label='{}'.format(listFrel[counter][0]))
                     # ax.hist(listFrel[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='blue', alpha=0.5, label='{}'.format(listFrel[counter][0]))
                     ax.set_xlabel('Frequency')
-                    ax.set_ylabel('Number common genes')
+                    ax.set_ylabel('Number genes')
                     leg = ax.legend(loc='upper left')
                     leg.draw_frame(False)
                 # Remove axis when we no longer have data
