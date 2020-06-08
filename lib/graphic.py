@@ -502,7 +502,7 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
             listFrel.append([k])
         i = 1
         while i < len(l):
-            listFrel[(i-1)%len(l[0])].append(l[i][3])
+            listFrel[[u[0] for u in listFrel].index(l[i][0])].append(l[i][3])
             i += 1
 
         frelOriginalFile = []
@@ -554,8 +554,6 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
 
         listFrel = sorted(listFrel, key=ut.ord)
         frelOriginalFile = sorted(frelOriginalFile, key=ut.ord)
-        # print([(u[0], len(u)) for u in frelOriginalFile])
-        # print([u[0] for u in listFrel])
         #Prepare parameters to draw the histograms
         num_rows = int(len(listFrel)/2)
         if num_rows == 1:
@@ -570,7 +568,7 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
                 ax = axes[i][j]
                 # Plot when we have data
                 if counter < len(listFrel):
-                    #Draw histogram with log10 axes
+                    #Draw histogram with linear axes
                     ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, range=[0.0, 1.0], edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' analyzed genes'])
                     # ax.hist(frelOriginalFile[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='green', alpha=0.5, label='{}'.format(listFrel[counter][0]))
                     # ax.hist(listFrel[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='blue', alpha=0.5, label='{}'.format(listFrel[counter][0]))
