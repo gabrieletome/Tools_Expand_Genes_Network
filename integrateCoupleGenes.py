@@ -203,9 +203,8 @@ def main():
                             except:
                                 pass
                             i += 1
-                if printDiagram or typeAnalyze == 2:
-                    #find common genes
-                    listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
+                #find common genes
+                listCommonGenes = utex.findCommonGenes(listCouple, listFiles)
                 if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
                     edgesGraph = utex.buildEdgesFrelRank(listCouple, listFiles)
                 elif typeAnalyze == 2: #shared
@@ -222,9 +221,8 @@ def main():
                         i += 1
                 #read which isoforms compone the edges
                 isoformInEdge = utex.readFiles(cmd[0][-1])
-                if printDiagram or typeAnalyze == 2:
-                    #find common genes
-                    listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
+                #find common genes
+                listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
                 if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
                     edgesGraph = utex.buildEdgesFrelRankIsoform(listCouple, listFiles, isoformInEdge)
                 elif typeAnalyze == 2:
@@ -232,6 +230,7 @@ def main():
 
             #print CSV with genes share between every gene of LGN
             printCSV(edgesGraph)
+            utex.printCSVSubset(listCommonGenes[1], nameDir)
             #Draw the Venn diagram, Histogram
             if printDiagram:
                 utex.printNumberVenn(listCommonGenes, nameDir)

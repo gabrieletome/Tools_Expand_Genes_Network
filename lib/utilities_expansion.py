@@ -555,3 +555,31 @@ def manageBR(l):
                 tmp[1] = name
                 l.append(tuple(tmp))
     return l
+
+#
+def printCSVSubset(listForVenn, nameDir):
+    for k in listForVenn:
+        listKey = sorted([u for u in k.keys()], key=len)
+        nameF = ''
+        for g in sorted([u for u in listKey if len(u.split(',')) == 1]):
+            if nameF == '':
+                nameF = g.split('\'')[1]
+            else:
+                nameF += '_'+g.split('\'')[1]
+        #Print .csv for each combination of genes of LGN. They contain the list of genes associated to that combination
+        #FIX
+        for key in listKey:
+            nameFile = ''
+            for g in sorted(key.split('\'')):
+                if len(g) > 4:
+                    if nameFile == '':
+                        nameFile = g
+                    else:
+                        nameFile += '_'+g
+
+            f = open(nameDir+nameF+'/'+nameFile+'.csv', 'w')
+            f.write(nameFile+'\n')
+            #print(k)
+            for elem in k[str(key)]:
+                f.write(str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n')
+            f.close()

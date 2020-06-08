@@ -400,23 +400,7 @@ def printVenn(listForVenn, couples, nameDir):
                 nameF = g.split('\'')[1]
             else:
                 nameF += '_'+g.split('\'')[1]
-        #Print .csv for each combination of genes of LGN. They contain the list of genes associated to that combination
-        #FIX
-        for key in listKey:
-            nameFile = ''
-            for g in sorted(key.split('\'')):
-                if len(g) > 4:
-                    if nameFile == '':
-                        nameFile = g
-                    else:
-                        nameFile += '_'+g
-
-            f = open(nameDir+nameF+'/'+nameFile+'.csv', 'w')
-            f.write(nameFile+'\n')
-            #print(k)
-            for elem in k[str(key)]:
-                f.write(str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n')
-            f.close()
+        
         #Draw venn diagram with 2 sets
         if len(couples[listForVenn.index(k)]) == 2:
             elemSubSets = (len(k[str(listKey[0])]), len(k[str(listKey[1])]), int(len(k[str(listKey[2])])/2))
@@ -495,7 +479,6 @@ def printVenn(listForVenn, couples, nameDir):
 
 #Draw histogram graph of common genes
 def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEdge):
-
     for l in listCommonGenes:
         listFrel = []
         for k in l[0]:
