@@ -400,7 +400,7 @@ def printVenn(listForVenn, couples, nameDir):
                 nameF = g.split('\'')[1]
             else:
                 nameF += '_'+g.split('\'')[1]
-        
+
         #Draw venn diagram with 2 sets
         if len(couples[listForVenn.index(k)]) == 2:
             elemSubSets = (len(k[str(listKey[0])]), len(k[str(listKey[1])]), int(len(k[str(listKey[2])])/2))
@@ -474,6 +474,80 @@ def printVenn(listForVenn, couples, nameDir):
             plt.savefig(nameDir+nameF+'/venn_'+nameUnifyGenes+'.png')
             print('Create: \''+nameF+'/venn_'+nameUnifyGenes+'.png\'')
 
+        #Draw Venn diagram with 5 sets
+        if len(couples[listForVenn.index(k)]) == 5:
+            #made all possible combination of genes
+            listKey = sorted([str([elem]) for elem in couples[listForVenn.index(k)]])
+            listKeyL = sorted([[elem] for elem in couples[listForVenn.index(k)]])
+            listKey.append(str([listKeyL[0][0],listKeyL[1][0],listKeyL[2][0],listKeyL[3][0],listKeyL[4][0]]))
+            i = 0
+            j = 1
+            w = 3
+            z = 2
+            while i < 5:
+                tmp = listKeyL[i][0]
+                while j < 5:
+                    listKey.append(str([tmp,listKeyL[j][0]]))
+                    while z < 5:
+                        listKey.append(str([tmp,listKeyL[j][0],listKeyL[z][0]]))
+                        while w < 5:
+                            listKey.append(str([tmp,listKeyL[j][0],listKeyL[z][0],listKeyL[w][0]]))
+                            w+=1
+                        z+=1
+                        w=z+1
+                    j+=1
+                    z=j+1
+                    w=z+1
+                i+=1
+                j=i+1
+                z=j+1
+                w=z+1
+            listKey = sorted(listKey, key=len)
+            keyAndNumber = [(key,len(k[key])) for key in sorted(k.keys(), key=len)]
+            completeKeyNumber = {}
+            for key in listKey:
+                if key in [elem[0] for elem in keyAndNumber]:
+                    completeKeyNumber[key] = keyAndNumber[[elem[0] for elem in keyAndNumber].index(key)][1]
+                else:
+                    completeKeyNumber[key] = 0
+            #print(completeKeyNumber)
+            dictLabels = {
+                '00001': completeKeyNumber[listKey[0]],
+                '00010': completeKeyNumber[listKey[1]],
+                '00011': int(completeKeyNumber[listKey[5]]/2),
+                '00100': completeKeyNumber[listKey[2]],
+                '00101': int(completeKeyNumber[listKey[6]]/2),
+                '00110': int(completeKeyNumber[listKey[9]]/2),
+                '00111': int(completeKeyNumber[listKey[15]]/3),
+                '01000': completeKeyNumber[listKey[3]],
+                '01001': int(completeKeyNumber[listKey[7]]/2),
+                '01010': int(completeKeyNumber[listKey[10]]/2),
+                '01011': int(completeKeyNumber[listKey[16]]/3),
+                '01100': int(completeKeyNumber[listKey[12]]/2),
+                '01101': int(completeKeyNumber[listKey[18]]/3),
+                '01110': int(completeKeyNumber[listKey[21]]/3),
+                '01111': int(completeKeyNumber[listKey[25]]/4),
+                '10000': completeKeyNumber[listKey[4]],
+                '10001': int(completeKeyNumber[listKey[8]]/2),
+                '10010': int(completeKeyNumber[listKey[11]]/2),
+                '10011': int(completeKeyNumber[listKey[17]]/3),
+                '10100': int(completeKeyNumber[listKey[13]]/2),
+                '10101': int(completeKeyNumber[listKey[19]]/3),
+                '10110': int(completeKeyNumber[listKey[22]]/3),
+                '10111': int(completeKeyNumber[listKey[26]]/4),
+                '11000': int(completeKeyNumber[listKey[14]]/2),
+                '11001': int(completeKeyNumber[listKey[20]]/3),
+                '11010': int(completeKeyNumber[listKey[23]]/3),
+                '11011': int(completeKeyNumber[listKey[27]]/4),
+                '11100': int(completeKeyNumber[listKey[24]]/3),
+                '11101': int(completeKeyNumber[listKey[28]]/4),
+                '11110': int(completeKeyNumber[listKey[29]]/4),
+                '11111': int(completeKeyNumber[listKey[30]]/5),
+            }
+            v = vennD.venn5(dictLabels, names=[listKeyL[4][0],listKeyL[3][0],listKeyL[2][0],listKeyL[1][0],listKeyL[0][0]])
+            nameUnifyGenes = str(listKeyL[0][0]) +'_'+ str(listKeyL[1][0]) +'_'+ str(listKeyL[2][0]) +'_'+ str(listKeyL[3][0]) +'_'+ str(listKeyL[4][0])
+            plt.savefig(nameDir+nameF+'/venn_'+nameUnifyGenes+'.png')
+            print('Create: \''+nameF+'/venn_'+nameUnifyGenes+'.png\'')
         plt.clf()
         plt.close()
 
@@ -487,7 +561,6 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
         while i < len(l):
             listFrel[[u[0] for u in listFrel].index(l[i][0])].append(l[i][3])
             i += 1
-
         frelOriginalFile = []
         for name in [u[0] for u in listFiles]:
             if isNotFantom:
@@ -534,11 +607,10 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
                         if u[0] == name:
                             tmp = tmp + [k[2] for k in u[1:]]
                     frelOriginalFile[[u[0] for u in frelOriginalFile].index((name.split('@'))[1])] = tmp
-
         listFrel = sorted(listFrel, key=ut.ord)
         frelOriginalFile = sorted(frelOriginalFile, key=ut.ord)
         #Prepare parameters to draw the histograms
-        num_rows = int(len(listFrel)/2)
+        num_rows = int((float(len(listFrel))-0.1)/2)+1
         if num_rows == 1:
             num_rows+=1;
         num_bins = 20

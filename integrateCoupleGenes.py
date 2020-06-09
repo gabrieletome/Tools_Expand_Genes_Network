@@ -306,14 +306,13 @@ def main():
                 #Calculating pearson correlation for each edge
                 print('Calculating Pearson correlation '+str(utex.buildNamefile(l))+'...')
                 if vitis: #TODO: manage Pearson Correlation if expansion with GT-001
-                    for u in l[1:]:
-                        try:
-                            (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(u[2])])
-                        except:
-                            print(u)
-                    listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:]]
+                    #listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:]]
+                    #TODEL_GT-001
+                    listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:] if a != 'GT-001' and c != 'GT-001']
                     tmp = utex.manageBR(ut.pearsonCorrelation(listForPearson, 'vv_exprdata_2.csv'))
-                    pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]
+                    #pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]
+                    #TODEL_GT-001
+                    pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]+[((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),1) for (a,b,c,d) in l[1:] if a == 'GT-001' or c == 'GT-001']
                     pearsonComplete.append(pearson)
                 else:
                     listForPearson = [(a,c,d) for (a,b,c,d) in l[1:]]

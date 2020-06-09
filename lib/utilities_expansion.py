@@ -113,6 +113,8 @@ def readFilesGenes(listFiles, coupleGenes, listfilter, vitis, TCGAdb, listBioNam
                             listGenes = []
                             if vitis:
                                 listGenes = (ut.readFilesVitis(namefilezip,True))[0]
+                                if nameGene == 'GT-001':
+                                    listGenes[0] = nameGene #TODEL_GT-001
                             else:
                                 listGenes = readFilesHuman(namefilezip, TCGAdb)
                             os.remove(namefilezip)
@@ -257,7 +259,7 @@ def printNumberVenn(listCommonGenes, nameDir):
         #create dir for each couple of genes
         nameDirGenes = nameDir+nameF+'/'
         f = open(nameDirGenes+'venn_number_'+nameF+'.txt', 'w')
-        f.write('---> NUMBER GENES IN \''+nameF+'\': '+str(int(len(listCommonGenes[0][i][1:])/len(listCommonGenes[0][i][0])))+'\n')
+        f.write('---> NUMBER GENES IN \''+nameF+'\': '+str(int(len([u for u in listCommonGenes[0][i][1:] if not (u[0] in listCommonGenes[0][i][0] and u[2] in listCommonGenes[0][i][0])])/len(listCommonGenes[0][i][0])))+'\n')
         listKey = sorted([u for u in listCommonGenes[1][i].keys()], key=len)
         #listKey = sorted([u for u in listCommonGenes[1][i].keys() if len(u.split(',')) == 1], key=len)
         #listKey = sorted([(re.findall(r'\w+', u)) for u in listCommonGenes[1][i].keys()], key=len)
