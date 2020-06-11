@@ -116,7 +116,7 @@ def main():
         global nameDir
         nameDir = 'commonGenesOutput/'+printTime+'/'+utex.buildNamefile(edges)+'/'
         print('Creating directory: \''+nameDir+'\'', flush=True)
-        graphic.printCommonGraph([edges], pearsonComplete, 1-round(edges[-1][3], 1), nameDir, True)
+        graphic.printCommonGraph([edges], pearsonComplete, 1-round((edges[-1][3]), 1), nameDir, False)
 
 #Calls the main() function.
 if __name__ == '__main__':
