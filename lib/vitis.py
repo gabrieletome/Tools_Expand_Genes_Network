@@ -124,15 +124,33 @@ def printOutput(coreGraph, graphGenes):
     i = 0
     while i < len(coreGraph):
         tmp = coreGraph[i]
-        coreGraph[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        try:
+            coreGraph[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        except:
+            try:
+                coreGraph[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
+            except:
+                coreGraph[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
         i += 1
     i = 0
     while i < len(graphGenes):
         tmp = graphGenes[i]
-        graphGenes[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        try:
+            graphGenes[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        except:
+            try:
+                graphGenes[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
+            except:
+                graphGenes[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
         tmp = pearsonComplete[i]
-        pearsonComplete[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
-        i += 1
+        try:
+            pearsonComplete[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        except:
+            try:
+                pearsonComplete[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
+            except:
+                pearsonComplete[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
+       i += 1
 
     #RETURN CORE
     nameFileCore = 'networkOutput/'+printTime+'/Core_Graph'
