@@ -321,7 +321,7 @@ def main():
                 print('Pearson Correlation done')
 
             #Draw graph
-            graphic.printCommonGraph(edgesGraph, pearsonComplete, 1-min_frel, nameDir, autoSaveImg)
+            graphic.printCommonGraph(edgesGraph, pearsonComplete, 1-min_frel, nameDir, autoSaveImg, listBioNameUpdate)
         else:
             print('ERROR: wrong format')
             utex.printInfo()

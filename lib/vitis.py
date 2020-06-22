@@ -150,7 +150,7 @@ def printOutput(coreGraph, graphGenes):
                 pearsonComplete[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
             except:
                 pearsonComplete[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
-       i += 1
+        i += 1
 
     #RETURN CORE
     nameFileCore = 'networkOutput/'+printTime+'/Core_Graph'

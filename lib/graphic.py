@@ -239,7 +239,7 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
     plt.close()
 
 #Draw graph of expansion LGN
-def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, autoSaveImg):
+def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, autoSaveImg, listBioNameUpdate):
     #range to divide type of edges
     step1_range = round((range_frel/3)+1-range_frel, 2)
     step2_range = round((range_frel/3*2)+1-range_frel, 2)
@@ -359,25 +359,40 @@ def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, auto
         red_line = mlines.Line2D([], [], linewidth=1, color='black', label='frel <= '+str(step1_range), linestyle='dotted')
         pos_line = mlines.Line2D([], [], linewidth=1, color='black', label='Pearson corr. >= 0')
         neg_line = mlines.Line2D([], [], linewidth=1, color='red', label='Pearson corr. < 0')
-        idName = mlines.Line2D([], [], label='ID --> NAME', visible=False)
         if len(eNeg) > 0:
             textLegend = [black_line, blue_line, red_line, pos_line, neg_line]
         else:
             textLegend = [black_line, blue_line, red_line]
+        circleLGN = mlines.Line2D(range(1), range(1), color="white", marker='o', markerfacecolor="#FF3232", label='Genes in LGN')
+        circleNewNodes = mlines.Line2D(range(1), range(1), color="white", marker='o', markerfacecolor='#48B3FF', label='Discovered genes')
+        textLegend.append(circleLGN)
+        textLegend.append(circleNewNodes)
+        #Write legend ID-->GENE
         nameGenes = idNode.keys()
-        if len(nameGenes) < 15:
-            textLegend.append(idName)
-            for k in nameGenes:
-                textLegend.append(mlines.Line2D([], [], label=str(idNode[k])+' --> '+k, visible=False))
-        else:
-            fileOut = namefile+'_ID_NAME.txt'
-            print('Too many nodes, ID --> NAME write in: \''+fileOut+'\'')
-            f = open(fileOut, 'w')
-            f.write('ID --> NODE\n')
-            for k in nameGenes:
-                f.write(str(idNode[k])+' --> '+k+'\n')
-            f.close()
-            #textLegend.append(mlines.Line2D([], [], label='in \''+(fileOut.split('/'))[-1]+'\'', visible=False))
+        dictStrToWrite = {}
+        #Read information of Vitis genes
+        f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
+        text = f.readlines()
+        listLineName = []
+        i = 1
+        while i < len(text):
+            listLineName.append(text[i].split(','))
+            i += 1
+        for k in nameGenes:
+            if (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]) in [u[0].upper() for u in listLineName]:
+                index = [u[0].upper() for u in listLineName].index((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]))
+                u = listLineName[index]
+                dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)])] = str(u[0])+','+str(u[1])+','+str(u[2])+','+str(u[3])+','+str(u[4])+','+str(u[5])
+
+        fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
+        print('LEGEND IN: \''+fileOut+'\'')
+        f = open(fileOut, 'w')
+        f.write('ID in graph,'+text[0].split(',')[0]+','+text[0].split(',')[1]+','+text[0].split(',')[2]+','+text[0].split(',')[3]+','+text[0].split(',')[4]+','+text[0].split(',')[5])
+        for k in nameGenes:
+            f.write(str(idNode[k])+','+dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)])])
+        f.close()
+
+        #textLegend.append(mlines.Line2D([], [], label='in \''+(fileOut.split('/'))[-1]+'\'', visible=False))
         plt.legend(handles=textLegend, fontsize = 'xx-small').set_draggable(True)
         #autoSave PNG or show
         if autoSaveImg:
