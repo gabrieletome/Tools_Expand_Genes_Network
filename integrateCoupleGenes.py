@@ -110,10 +110,12 @@ def printCSV(listCommonGenes):
     for k in listCommonGenes:
         nameF = utex.buildNamefile(k)
         #create dir for each couple of genes
-        nameDirGenes = nameDir+nameF+'/'
+        nameDirGenes = nameDir+str(listCommonGenes.index(k))+'/'
+        nameF = nameF.replace("<", "_")
+        nameF = nameF.replace(">", "_")
         os.mkdir(nameDirGenes)
         #Write file .csv
-        f = open(nameDirGenes+nameF+'.csv', 'w')
+        f = open(nameDirGenes+'edges_graph'+'.csv', 'w')
         string = str(nameF)+'\n'
         f.write(string)
         for elem in k[1:]:
@@ -265,43 +267,46 @@ def main():
                 if completeGraph:
                     #write in a .txt the genes to download
                     listFileToRead = utex.nameAssociateGene(l, listBioNameUpdate, TCGAdb)
-                    strToPrint = "To draw edges between associated genes please download lists in file \'"+nameDir+str(utex.buildNamefile(l))+"/listToDownload.txt"
-                    f = open(nameDir+str(utex.buildNamefile(l))+'/listToDownload.txt', 'w')
-                    for g in listFileToRead:
-                        f.write(str(g) + ', ')
-                    f.close()
-                    print(strToPrint, flush=True)
-                    #wait until they gave the path
-                    print('Please write the path of file zip:', flush=True)
-                    path = input('>>')
-                    print('FILE ZIP: '+path, flush=True)
-                    if vitis:
-                        #read file and find edges between them
-                        matrixGenes = vit.buildMatrixGenesVitis([('-f', min_frel)], [path])
-                        print('Finding edges between genes...')
-                        graphGenes = ut.manageDuplicates(ut.buildGraph(matrixGenes))
-                        print('Process complete')
-                        #save new edges in the list
-                        nameF = utex.buildNamefile(l)
-                        #create dir for each couple of genes
-                        nameDirGenes = nameDir+nameF+'/'
-                        #Write file .csv
-                        f = open(nameDirGenes+nameF+'.csv', 'a')
-                        i = 0
-                        while i < len(graphGenes):
-                            try:
-                                rank = matrixGenes[[u[0] for u in matrixGenes].index(graphGenes[i][0])]
-                                rank = rank[[v for (k,v,w,a,b) in rank[1:]].index(graphGenes[i][1])]
-                            except:
-                                rank = matrixGenes[[u[0] for u in matrixGenes].index(graphGenes[i][1])]
-                                rank = rank[[v for (k,v,w,a,b) in rank[1:]].index(graphGenes[i][0])]
-                            f.write(str(listBioNameUpdate[graphGenes[i][0]])+','+str(rank[0])+','+str(listBioNameUpdate[graphGenes[i][1]])+','+str(graphGenes[i][2])+'\n')
-                            l.append((listBioNameUpdate[graphGenes[i][0]], rank[0], listBioNameUpdate[graphGenes[i][1]], graphGenes[i][2]))
-                            i += 1
+                    if len(listFileToRead) > 0:
+                        strToPrint = "To draw edges between associated genes please download lists in file \'"+nameDir+str(edgesGraph.index(l))+"/listToDownload.txt"
+                        f = open(nameDir+str(edgesGraph.index(l))+'/listToDownload.txt', 'w')
+                        for g in listFileToRead:
+                            f.write(str(g) + ', ')
                         f.close()
-                    else:
-                        pass
-                        #TODO: find a way to download the lists of human
+                        print(strToPrint, flush=True)
+                        #wait until they gave the path
+                        print('Please write the path of file zip:', flush=True)
+                        path = input('>>')
+                        print('FILE ZIP: '+path, flush=True)
+                        if vitis:
+                            #read file and find edges between them
+                            matrixGenes = vit.buildMatrixGenesVitis([('-f', min_frel)], [path])
+                            print('Finding edges between genes...')
+                            graphGenes = ut.manageDuplicates(ut.buildGraph(matrixGenes))
+                            print('Process complete')
+                            #save new edges in the list
+                            nameF = utex.buildNamefile(l)
+                            #create dir for each couple of genes
+                            nameDirGenes = nameDir+str(edgesGraph.index(l))+'/'
+                            #Write file .csv
+                            nameF = nameF.replace("<", "_")
+                            nameF = nameF.replace(">", "_")
+                            f = open(nameDirGenes+'edges_graph'+'.csv', 'a')
+                            i = 0
+                            while i < len(graphGenes):
+                                try:
+                                    rank = matrixGenes[[u[0] for u in matrixGenes].index(graphGenes[i][0])]
+                                    rank = rank[[v[1] for v in rank[1:]].index(graphGenes[i][1])]
+                                except:
+                                    rank = matrixGenes[[u[0] for u in matrixGenes].index(graphGenes[i][1])]
+                                    rank = rank[[v[1] for v in rank[1:]].index(graphGenes[i][0])]
+                                f.write(str(listBioNameUpdate[graphGenes[i][0]])+','+str(rank[0])+','+str(listBioNameUpdate[graphGenes[i][1]])+','+str(graphGenes[i][2])+'\n')
+                                l.append((listBioNameUpdate[graphGenes[i][0]], rank[0], listBioNameUpdate[graphGenes[i][1]], graphGenes[i][2]))
+                                i += 1
+                            f.close()
+                        else:
+                            pass
+                            #TODO: find a way to download the lists of human
 
                 #Calculating pearson correlation for each edge
                 print('Calculating Pearson correlation '+str(utex.buildNamefile(l))+'...')

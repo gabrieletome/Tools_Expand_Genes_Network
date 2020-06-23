@@ -257,7 +257,9 @@ def printNumberVenn(listCommonGenes, nameDir):
     while i < len(listCommonGenes[0]):
         nameF = buildNamefile(listCommonGenes[0][i])
         #create dir for each couple of genes
-        nameDirGenes = nameDir+nameF+'/'
+        nameF = nameF.replace("<", "_")
+        nameF = nameF.replace(">", "_")
+        nameDirGenes = nameDir+str(i)+'/'
         f = open(nameDirGenes+'venn_number_'+nameF+'.txt', 'w')
         f.write('---> NUMBER GENES IN \''+nameF+'\': '+str(int(len([u for u in listCommonGenes[0][i][1:] if not (u[0] in listCommonGenes[0][i][0] and u[2] in listCommonGenes[0][i][0])])/len(listCommonGenes[0][i][0])))+'\n')
         listKey = sorted([u for u in listCommonGenes[1][i].keys()], key=len)
@@ -578,8 +580,11 @@ def printCSVSubset(listForVenn, nameDir):
                         nameFile = g
                     else:
                         nameFile += '_'+g
-
-            f = open(nameDir+nameF+'/'+nameFile+'.csv', 'w')
+            nameF = nameF.replace("<", "_")
+            nameF = nameF.replace(">", "_")
+            nameFile = nameFile.replace("<", "_")
+            nameFile = nameFile.replace(">", "_")
+            f = open(nameDir+str(listForVenn.index(k))+'/'+nameFile+'.csv', 'w')
             f.write(nameFile+'\n')
             #print(k)
             for elem in k[str(key)]:

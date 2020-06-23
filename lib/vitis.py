@@ -106,19 +106,17 @@ def printOutput(coreGraph, graphGenes):
     listBioNameUpdate = {}
     for l in listLineName:
         if l[3] != '':
-            listBioNameUpdate[l[0].upper()] = l[3]
+            if l[3] not in listBioNameUpdate.values():
+                listBioNameUpdate[l[0].upper()] = l[3]
+            else:
+                listBioNameUpdate[l[0].upper()] = l[3]+'_'+l[0].upper()
         elif l[2] != '':
-            listBioNameUpdate[l[0].upper()] = l[2]
+            if l[2] not in listBioNameUpdate.values():
+                listBioNameUpdate[l[0].upper()] = l[2]
+            else:
+                listBioNameUpdate[l[0].upper()] = l[2]+'_'+l[0].upper()
         else:
             listBioNameUpdate[l[0].upper()] = l[0].upper()
-        for n in list_Genes:
-            if n == l[0].upper():
-                if l[3] != '':
-                    list_Genes[list_Genes.index(n)] = l[3]
-                elif l[2] != '':
-                    list_Genes[list_Genes.index(n)] = l[2]
-                else:
-                    list_Genes[list_Genes.index(n)] = l[0].upper()
     f.close()
     #update name of genes
     i = 0
