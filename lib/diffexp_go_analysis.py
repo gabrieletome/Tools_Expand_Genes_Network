@@ -17,6 +17,9 @@ import collections
 import rpy2.robjects as robjects
 
 def main(input_csv, gene_to_go_file):
+    topGO_analysis(input_csv, gene_to_go_file)
+
+def topGO_analysis(input_csv, gene_to_go_file):
     gene_pval = 1e-2
     go_pval = 0.2
     go_term_type = "MF"
@@ -29,24 +32,21 @@ def main(input_csv, gene_to_go_file):
     if len(gene_to_go) == 0:
         raise ValueError("No GO terms match to input genes. "
               "Check that the identifiers between the input and GO file match.")
-    go_terms, results_table = run_topGO(genes_w_pvals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method)
-    print_go_info(go_terms, go_term_type, go_to_gene, results_table)
+    go_terms, results_table, results = run_topGO(genes_w_pvals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method)
+    genes, strValue = print_go_info(go_terms, go_term_type, go_to_gene)
+    return genes, strValue, results_table, results
 
-def print_go_info(go_terms, go_term_type, go_to_gene, results_table):
-    f = open('output.txt', 'w')
+def print_go_info(go_terms, go_term_type, go_to_gene):
     for final_pval, go_id, go_term in go_terms:
         genes = []
         for check_go in [go_id] + get_go_children(go_id, go_term_type):
             genes.extend(go_to_gene.get(check_go, []))
         genes = sorted(list(set(genes)))
-        print("-> %s (%s) : %0.4f" % (go_id, go_term, final_pval))
+        strValue = "-> %s (%s) : %0.4f" % (go_id, go_term, final_pval)
+        print(strValue)
         for g in genes:
             print(g)
-
-        f.write(str(results_table))
-        f.write("-> %s (%s) : %0.4f\n" % (go_id, go_term, final_pval))
-        f.write(str(genes))
-    f.close()
+        return genes, strValue
 
 def get_go_children(go_term, go_term_type):
     """Retrieve all more specific GO children from a starting GO term.
@@ -96,9 +96,10 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     num_summarize = min(100, len(scores.names))
     # extract term names from the topGO summary dataframe
     results_table = robjects.r.GenTable(go_data, elimFisher=results, orderBy="elimFisher", topNodes=num_summarize)
-    print('####################################################')
-    print(results_table)
-    print('####################################################')
+
+    robjects.r.showSigOfNodes(go_data, scores, firstSigNodes = 5, useInfo='all')
+    robjects.r.printGraph(go_data, results, firstSigNodes = 5, fn.prefix = "sampleFile", useInfo = "all", pdfSW = True)
+
     GO_ID_INDEX = 0
     TERM_INDEX = 1
     ids_to_terms = dict()
@@ -111,7 +112,9 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
             go_id = scores.names[index]
             go_terms.append((item, go_id, ids_to_terms.get(go_id, "")))
     go_terms.sort()
-    return go_terms, results_table
+
+    print(results_table)
+    return go_terms, results_table, results
 
 def parse_go_map_file(in_handle, genes_w_pvals):
     gene_list = genes_w_pvals.keys()
