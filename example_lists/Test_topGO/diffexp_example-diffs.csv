@@ -1,0 +1,5 @@
+Region,Condition 1 count,Condition 2 count,edgeR p-value
+GeneC,100,25,1.05987026716e-18
+GeneA,15,60,0.000606472874173
+GeneD,20,20,0.281371046659
+GeneB,20,30,0.999999999999
