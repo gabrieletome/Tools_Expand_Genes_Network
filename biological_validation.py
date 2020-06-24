@@ -5,7 +5,7 @@ import rpy2.robjects as ro
 import pandas as pd
 import lib.diffexp_go_analysis as topGO
 
-def print_output_topGO(genes, strValue, results_table, results):
+def createSavingDir():
     #create directory
     if not os.path.exists('outputBiologicalValidation'):
         os.mkdir('outputBiologicalValidation')
@@ -16,6 +16,9 @@ def print_output_topGO(genes, strValue, results_table, results):
     global nameDir
     nameDir = 'outputBiologicalValidation/'+printTime+'/'
     print('Creating directory: \''+nameDir+'\'', flush=True)
+    return nameDir
+
+def print_output_topGO(genes, strValue, results_table, results, nameDir):
 
     #Write file .csv
     f = open(nameDir+'validation_topGO.txt', 'w')
@@ -35,9 +38,10 @@ def main():
     if len(sys.argv) >= 2:
         if sys.argv[1] == '-topGO':
             #read parameters
+            nameDir = createSavingDir()
             #genes, strValue, results_table, results = topGO.topGO_analysis(sys.argv[2], 'import_doc/V1_GOcomplete.txt')
-            genes, strValue, results_table, results = topGO.topGO_analysis(sys.argv[2], sys.argv[3])
-            print_output_topGO(genes, strValue, results_table, results)
+            genes, strValue, results_table, results = topGO.topGO_analysis(sys.argv[2], sys.argv[3], nameDir)
+            print_output_topGO(genes, strValue, results_table, results, nameDir)
     else:
         print('ERROR: wrong nuomber of parameters')
 
