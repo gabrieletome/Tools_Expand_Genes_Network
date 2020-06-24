@@ -13,13 +13,13 @@ from __future__ import with_statement
 import sys
 import csv
 import collections
-
+import os
 import rpy2.robjects as robjects
 
 def main(input_csv, gene_to_go_file):
-    topGO_analysis(input_csv, gene_to_go_file)
+    topGO_analysis(input_csv, gene_to_go_file, '')
 
-def topGO_analysis(input_csv, gene_to_go_file):
+def topGO_analysis(input_csv, gene_to_go_file, nameDir):
     gene_pval = 1e-2
     go_pval = 0.2
     go_term_type = "MF"
@@ -32,7 +32,7 @@ def topGO_analysis(input_csv, gene_to_go_file):
     if len(gene_to_go) == 0:
         raise ValueError("No GO terms match to input genes. "
               "Check that the identifiers between the input and GO file match.")
-    go_terms, results_table, results = run_topGO(genes_w_pvals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method)
+    go_terms, results_table, results = run_topGO(genes_w_pvals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method, nameDir)
     genes, strValue = print_go_info(go_terms, go_term_type, go_to_gene)
     return genes, strValue, results_table, results
 
@@ -72,7 +72,7 @@ def _dict_to_namedvector(init_dict):
     """
     return robjects.r.c(**init_dict)
 
-def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method):
+def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method, nameDir):
     """Run topGO, returning a list of pvalues and terms of interest.
     """
     # run topGO with our GO and gene information
@@ -98,7 +98,9 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     results_table = robjects.r.GenTable(go_data, elimFisher=results, orderBy="elimFisher", topNodes=num_summarize)
 
     robjects.r.showSigOfNodes(go_data, scores, firstSigNodes = 5, useInfo='all')
-    robjects.r.printGraph(go_data, results, firstSigNodes = 5, fn.prefix = "sampleFile", useInfo = "all", pdfSW = True)
+    os.remove('Rplots.pdf')
+    paramPrint = {'firstSigNodes': 5, 'fn.prefix': nameDir+"graph", 'useInfo': "all", 'pdfSW': True}
+    robjects.r.printGraph(go_data, results, **paramPrint)
 
     GO_ID_INDEX = 0
     TERM_INDEX = 1
