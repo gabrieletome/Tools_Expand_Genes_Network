@@ -18,16 +18,16 @@ def createSavingDir():
     print('Creating directory: \''+nameDir+'\'', flush=True)
     return nameDir
 
-def print_output_topGO(genes, strValue, results_table, results, nameDir):
+def print_output_topGO(results_table, results, nameDir):
 
     #Write file .csv
     f = open(nameDir+'validation_topGO.txt', 'w')
-    f.write(strValue+'\n\n')
-    string_tmp = 'LIST GENES: '
-    for g in genes[:-1]:
-        string_tmp = string_tmp+str(g)+', '
-    string_tmp = string_tmp+str(genes[-1])
-    f.write(string_tmp+'\n')
+    # f.write(strValue+'\n\n')
+    # string_tmp = 'LIST GENES: '
+    # for g in genes[:-1]:
+    #     string_tmp = string_tmp+str(g)+', '
+    # string_tmp = string_tmp+str(genes[-1])
+    # f.write(string_tmp+'\n')
 
     f.write(str(results)+'\n\n')
     pd_dt = ro.conversion.rpy2py(results_table)
@@ -40,8 +40,10 @@ def main():
             #read parameters
             nameDir = createSavingDir()
             #genes, strValue, results_table, results = topGO.topGO_analysis(sys.argv[2], 'import_doc/V1_GOcomplete.txt')
-            genes, strValue, results_table, results = topGO.topGO_analysis(sys.argv[2], sys.argv[3], nameDir)
-            print_output_topGO(genes, strValue, results_table, results, nameDir)
+            #genes, strValue, results_table, results = topGO.topGO_analysis(sys.argv[2], sys.argv[3], nameDir)
+            results_table, results = topGO.topGO_analysis(sys.argv[2], sys.argv[3], nameDir)
+            #print_output_topGO(genes, strValue, results_table, results, nameDir)
+            print_output_topGO(results_table, results, nameDir)
     else:
         print('ERROR: wrong nuomber of parameters')
 

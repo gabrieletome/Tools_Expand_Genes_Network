@@ -36,10 +36,12 @@ def topGO_analysis(input_csv, gene_to_go_file, nameDir):
         raise ValueError("No GO terms match to input genes. "
               "Check that the identifiers between the input and GO file match.")
     go_terms, results_table, results = run_topGO(genes_w_pvals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_method, nameDir)
-    genes, strValue = print_go_info(go_terms, go_term_type, go_to_gene)
-    return genes, strValue, results_table, results
+    #genes, strValue = print_go_info(go_terms, go_term_type, go_to_gene)
+    #return genes, strValue, results_table, results
+    return results_table, results
 
 def print_go_info(go_terms, go_term_type, go_to_gene):
+    print(go_terms)
     for final_pval, go_id, go_term in go_terms:
         genes = []
         for check_go in [go_id] + get_go_children(go_id, go_term_type):
@@ -49,7 +51,7 @@ def print_go_info(go_terms, go_term_type, go_to_gene):
         print(strValue)
         for g in genes:
             print(g)
-        return genes, strValue
+    return genes, strValue
 
 def get_go_children(go_term, go_term_type):
     """Retrieve all more specific GO children from a starting GO term.
@@ -82,6 +84,14 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     robjects.r('''
         library(topGO)
     ''')
+    geneNames = list(gene_to_go.keys())
+    myInterestingGenes = list(gene_vals.keys())
+    dictBool = {}
+    for elem in geneNames:
+        if elem in myInterestingGenes:
+            dictBool[elem] = int(True)
+        else:
+            dictBool[elem] = int(False)
     robjects.r('''
         topDiffGenes = function(allScore) {
           return (allScore < %s)
@@ -103,7 +113,7 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
 
     robjects.r.showSigOfNodes(go_data, scores, firstSigNodes = 5, useInfo='all')
     os.remove('Rplots.pdf')
-    paramPrint = {'firstSigNodes': 5, 'fn.prefix': nameDir+"graph", 'useInfo': "all", 'pdfSW': True}
+    paramPrint = {'firstSigNodes': 5, 'fn.prefix': nameDir+"graph", 'useInfo': "all", 'pdfSW': False}
     robjects.r.printGraph(go_data, results, **paramPrint)
 
     GO_ID_INDEX = 0
@@ -114,9 +124,9 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     go_terms = []
     # convert the scores and results information info terms to return
     for index, item in enumerate(scores):
-        if item < go_pval:
-            go_id = scores.names[index]
-            go_terms.append((item, go_id, ids_to_terms.get(go_id, "")))
+        #if item < go_pval:
+        go_id = scores.names[index]
+        go_terms.append((item, go_id, ids_to_terms.get(go_id, "")))
     go_terms.sort()
     return go_terms, results_table, results
 
