@@ -21,9 +21,12 @@ def main(input_csv, gene_to_go_file):
 
 def topGO_analysis(input_csv, gene_to_go_file, nameDir):
     gene_pval = 1e-2
-    go_pval = 0.2
+    #go_pval = 0.2
+    go_pval = 1.01
     go_term_type = "MF"
-    topgo_method = "classic" # choice of classic, elim, weight
+    #go_term_type = "BP"
+    #topgo_method = "classic" # choice of classic, elim, weight
+    topgo_method = 'weight01'
 
     with open(input_csv) as in_handle:
         genes_w_pvals = parse_input_csv(in_handle)
@@ -93,9 +96,10 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     go_data = robjects.r.new("topGOdata", **params)
     results = robjects.r.runTest(go_data, algorithm=topgo_method, statistic="fisher")
     scores = robjects.r.score(results)
-    num_summarize = min(100, len(scores.names))
+    num_summarize = min(50, len(scores.names))
     # extract term names from the topGO summary dataframe
-    results_table = robjects.r.GenTable(go_data, elimFisher=results, orderBy="elimFisher", topNodes=num_summarize)
+    #results_table = robjects.r.GenTable(go_data, elimFisher=results, orderBy="elimFisher", topNodes=num_summarize)
+    results_table = robjects.r.GenTable(go_data, classicFisher=results, topNodes=num_summarize)
 
     robjects.r.showSigOfNodes(go_data, scores, firstSigNodes = 5, useInfo='all')
     os.remove('Rplots.pdf')
@@ -114,8 +118,6 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
             go_id = scores.names[index]
             go_terms.append((item, go_id, ids_to_terms.get(go_id, "")))
     go_terms.sort()
-
-    print(results_table)
     return go_terms, results_table, results
 
 def parse_go_map_file(in_handle, genes_w_pvals):
