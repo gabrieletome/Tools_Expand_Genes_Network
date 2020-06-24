@@ -232,7 +232,7 @@ def main():
 
             #print CSV with genes share between every gene of LGN
             printCSV(edgesGraph)
-            utex.printCSVSubset(listCommonGenes[1], nameDir)
+            utex.printCSVSubset(listCommonGenes[1], nameDir, listBioNameUpdate)
             #Draw the Venn diagram, Histogram
             if printDiagram:
                 utex.printNumberVenn(listCommonGenes, nameDir)
