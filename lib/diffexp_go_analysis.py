@@ -22,9 +22,9 @@ def main(input_csv, gene_to_go_file):
 def topGO_analysis(input_csv, gene_to_go_file, nameDir):
     gene_pval = 1e-2
     #go_pval = 0.2
-    go_pval = 1.01
-    go_term_type = "MF"
-    #go_term_type = "BP"
+    go_pval = 0.5
+    #go_term_type = "MF"
+    go_term_type = "BP"
     #topgo_method = "classic" # choice of classic, elim, weight
     topgo_method = 'weight01'
 
@@ -89,9 +89,9 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     dictBool = {}
     for elem in geneNames:
         if elem in myInterestingGenes:
-            dictBool[elem] = int(True)
-        else:
             dictBool[elem] = int(False)
+        else:
+            dictBool[elem] = int(True)
     robjects.r('''
         topDiffGenes = function(allScore) {
           return (allScore < %s)
@@ -100,16 +100,17 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     params = {"ontology" : go_term_type,
               "annot" : robjects.r["annFUN.gene2GO"],
               "geneSelectionFun" : robjects.r["topDiffGenes"],
-              "allGenes" : _dict_to_namedvector(gene_vals),
+              "allGenes" : _dict_to_namedvector(dictBool),
               "gene2GO" : _dict_to_namedvector(gene_to_go)
               }
     go_data = robjects.r.new("topGOdata", **params)
     results = robjects.r.runTest(go_data, algorithm=topgo_method, statistic="fisher")
     scores = robjects.r.score(results)
-    num_summarize = min(50, len(scores.names))
+    num_summarize = min(20, len(scores.names))
     # extract term names from the topGO summary dataframe
     #results_table = robjects.r.GenTable(go_data, elimFisher=results, orderBy="elimFisher", topNodes=num_summarize)
     results_table = robjects.r.GenTable(go_data, classicFisher=results, topNodes=num_summarize)
+    print(results_table)
 
     robjects.r.showSigOfNodes(go_data, scores, firstSigNodes = 5, useInfo='all')
     os.remove('Rplots.pdf')
@@ -138,11 +139,11 @@ def parse_go_map_file(in_handle, genes_w_pvals):
         parts = line.split("\t")
         gene_id = parts[0]
         go_id = parts[1].strip()
-        if gene_id in gene_list:
-            gene_to_go[gene_id].append([u for u in go_id.split(',') if u != ''])
-            for k in go_id.split(','):
-                if k != '':
-                    go_to_gene[k].append(gene_id)
+        #if gene_id in gene_list:
+        gene_to_go[gene_id].append([u for u in go_id.split(',') if u != ''])
+        for k in go_id.split(','):
+            if k != '':
+                go_to_gene[k].append(gene_id)
                 # gene_to_go[gene_id].append(go_id)
                 # go_to_gene[go_id].append(gene_id)
     return dict(gene_to_go), dict(go_to_gene)
