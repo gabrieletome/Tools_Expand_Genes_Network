@@ -96,7 +96,7 @@ def readParameters(input):
     return (listFiles,listFilter)
 
 #print file CSV with edges of graph
-def printCSV(listCommonGenes):
+def createDir():
     #create directory
     if not os.path.exists('commonGenesOutput'):
         os.mkdir('commonGenesOutput')
@@ -107,21 +107,21 @@ def printCSV(listCommonGenes):
     global nameDir
     nameDir = 'commonGenesOutput/'+printTime+'/'
     print('Creating directory: \''+nameDir+'\'', flush=True)
-    for k in listCommonGenes:
-        nameF = utex.buildNamefile(k)
-        #create dir for each couple of genes
-        nameDirGenes = nameDir+str(listCommonGenes.index(k))+'/'
-        nameF = nameF.replace("<", "_")
-        nameF = nameF.replace(">", "_")
-        os.mkdir(nameDirGenes)
-        #Write file .csv
-        f = open(nameDirGenes+'edges_graph'+'.csv', 'w')
-        string = str(nameF)+'\n'
-        f.write(string)
-        for elem in k[1:]:
-            string = str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n'
-            f.write(string)
-        f.close();
+    # for k in listCommonGenes:
+    #     nameF = utex.buildNamefile(k)
+    #     #create dir for each couple of genes
+    #     nameDirGenes = nameDir+str(listCommonGenes.index(k))+'/'
+    #     nameF = nameF.replace("<", "_")
+    #     nameF = nameF.replace(">", "_")
+    #     os.mkdir(nameDirGenes)
+    #     #Write file .csv
+    #     f = open(nameDirGenes+'edges_graph'+'.csv', 'w')
+    #     string = str(nameF)+'\n'
+    #     f.write(string)
+    #     for elem in k[1:]:
+    #         string = str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n'
+    #         f.write(string)
+    #     f.close();
 
 #Function to read the update name of human genes
 def updateNameHuman():
@@ -231,8 +231,8 @@ def main():
                     edgesGraph = listCommonGenes[0]
 
             #print CSV with genes share between every gene of LGN
-            printCSV(edgesGraph)
-            utex.printCSVSubset(listCommonGenes[1], nameDir, listBioNameUpdate)
+            createDir()
+            utex.printCSV(edgesGraph, listCommonGenes[1], nameDir, listBioNameUpdate)
             #Draw the Venn diagram, Histogram
             if printDiagram:
                 utex.printNumberVenn(listCommonGenes, nameDir)
@@ -292,6 +292,8 @@ def main():
                             nameF = nameF.replace("<", "_")
                             nameF = nameF.replace(">", "_")
                             f = open(nameDirGenes+'edges_graph'+'.csv', 'a')
+                            f.write('Edges between discovered genes\n')
+                            f.write('GeneA,rank,frel,GeneB\n')
                             i = 0
                             while i < len(graphGenes):
                                 try:
@@ -300,7 +302,8 @@ def main():
                                 except:
                                     rank = matrixGenes[[u[0] for u in matrixGenes].index(graphGenes[i][1])]
                                     rank = rank[[v[1] for v in rank[1:]].index(graphGenes[i][0])]
-                                f.write(str(listBioNameUpdate[graphGenes[i][0]])+','+str(rank[0])+','+str(listBioNameUpdate[graphGenes[i][1]])+','+str(graphGenes[i][2])+'\n')
+                                #f.write(str(listBioNameUpdate[graphGenes[i][0]])+','+str(rank[0])+','+str(listBioNameUpdate[graphGenes[i][1]])+','+str(graphGenes[i][2])+'\n')
+                                f.write(str(graphGenes[i][0])+','+str(rank[0])+','+str(graphGenes[i][2])+','+str(graphGenes[i][1])+'\n')
                                 l.append((listBioNameUpdate[graphGenes[i][0]], rank[0], listBioNameUpdate[graphGenes[i][1]], graphGenes[i][2]))
                                 i += 1
                             f.close()

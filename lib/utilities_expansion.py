@@ -561,10 +561,39 @@ def manageBR(l):
     return l
 
 #
-def printCSVSubset(listForVenn, nameDir,listBioNameUpdate):
+def printCSV(edgesGraph, listForVenn, nameDir,listBioNameUpdate):
+    #Read information of Vitis genes
+    f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
+    text = f.readlines()
+    lineIntro = str(text[0].split(',')[0])+','+str(text[0].split(',')[1])+','+str(text[0].split(',')[2])+','+str(text[0].split(',')[3])+','+str(text[0].split(',')[4])+','+str(text[0].split(',')[5][:-1])
+    i = 1
+    dictStrToWrite = {}
+    while i < len(text):
+        u = text[i].split(',')
+        dictStrToWrite[str(u[0]).upper()] = str(u[0])+','+str(u[1])+','+str(u[2])+','+str(u[3])+','+str(u[4])+','+str(u[5][:-1])
+        i += 1
+
+    for k in edgesGraph:
+        nameF = buildNamefile(k)
+        #create dir for each couple of genes
+        nameDirGenes = nameDir+str(edgesGraph.index(k))+'/'
+        nameF = nameF.replace("<", "_")
+        nameF = nameF.replace(">", "_")
+        os.mkdir(nameDirGenes)
+        #Write file .csv
+        f = open(nameDirGenes+'edges_graph'+'.csv', 'w')
+        f.write(str(nameF)+',rank,frel,'+lineIntro+'\n')
+        for elem in k[1:]:
+            f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[2])])]+'\n')
+            #
+            # string = str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n'
+            # f.write(string)
+        f.close();
+
     for k in listForVenn:
         listKey = sorted([u for u in k.keys()], key=len)
         nameF = ''
+        lenMax = len(sorted([u for u in listKey if len(u.split(',')) == 1]))
         for g in sorted([u for u in listKey if len(u.split(',')) == 1]):
             if nameF == '':
                 nameF = g.split('\'')[1]
@@ -573,20 +602,23 @@ def printCSVSubset(listForVenn, nameDir,listBioNameUpdate):
         #Print .csv for each combination of genes of LGN. They contain the list of genes associated to that combination
         #FIX
         for key in listKey:
-            nameFile = ''
-            for g in sorted(key.split('\'')):
-                if len(g) > 4:
-                    if nameFile == '':
-                        nameFile = g
-                    else:
-                        nameFile += '_'+g
-            nameF = nameF.replace("<", "_")
-            nameF = nameF.replace(">", "_")
-            nameFile = nameFile.replace("<", "_")
-            nameFile = nameFile.replace(">", "_")
-            f = open(nameDir+str(listForVenn.index(k))+'/'+nameFile+'.csv', 'w')
-            f.write(nameFile+'\n')
-            #print(k)
-            for elem in k[str(key)]:
-                f.write(str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n')
-            f.close()
+            if len(key.split(',')) != lenMax:
+                nameFile = ''
+                for g in sorted(key.split('\'')):
+                    if len(g) > 4:
+                        if nameFile == '':
+                            nameFile = g
+                        else:
+                            nameFile += '_'+g
+                nameF = nameF.replace("<", "_")
+                nameF = nameF.replace(">", "_")
+                nameFile = nameFile.replace("<", "_")
+                nameFile = nameFile.replace(">", "_")
+                f = open(nameDir+str(listForVenn.index(k))+'/'+nameFile+'.csv', 'w')
+                f.write(nameFile+',rank,frel,'+lineIntro+'\n')
+                #print(k)
+                for elem in k[str(key)]:
+                    f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[2])])]+'\n')
+                    #f.write(str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n')
+
+                f.close()
