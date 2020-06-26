@@ -17,21 +17,18 @@ import os
 import rpy2.robjects as robjects
 
 def main(input_csv, gene_to_go_file):
-    topGO_analysis(input_csv, gene_to_go_file, '')
+    topGO_analysis(input_csv, gene_to_go_file, '', 'BP')
 
-def topGO_analysis(input_csv, gene_to_go_file, nameDir):
+def topGO_analysis(input_csv, gene_to_go_file, nameDir, ontology):
     gene_pval = 1e-2
-    #go_pval = 0.2
     go_pval = 0.5
-    #go_term_type = "MF"
-    go_term_type = "BP"
-    #topgo_method = "classic" # choice of classic, elim, weight
-    topgo_method = 'weight01'
+    go_term_type = ontology #'BP' or 'MF'
+    topgo_method = 'weight01' #choice of classic, elim, weight
 
     with open(input_csv) as in_handle:
         genes_w_pvals = parse_input_csv(in_handle)
     with open(gene_to_go_file) as in_handle:
-        gene_to_go, go_to_gene = parse_go_map_file(in_handle, genes_w_pvals)
+        gene_to_go, go_to_gene = parse_go_map_file(in_handle)
     if len(gene_to_go) == 0:
         raise ValueError("No GO terms match to input genes. "
               "Check that the identifiers between the input and GO file match.")
@@ -85,10 +82,9 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
         library(topGO)
     ''')
     geneNames = list(gene_to_go.keys())
-    myInterestingGenes = list(gene_vals.keys())
     dictBool = {}
     for elem in geneNames:
-        if elem in myInterestingGenes:
+        if elem in gene_vals:
             dictBool[elem] = int(False)
         else:
             dictBool[elem] = int(True)
@@ -113,8 +109,9 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     print(results_table)
 
     robjects.r.showSigOfNodes(go_data, scores, firstSigNodes = 5, useInfo='all')
-    os.remove('Rplots.pdf')
-    paramPrint = {'firstSigNodes': 5, 'fn.prefix': nameDir+"graph", 'useInfo': "all", 'pdfSW': False}
+    if os.path.isfile('Rplots.pdf'):
+        os.remove('Rplots.pdf')
+    paramPrint = {'firstSigNodes': 5, 'fn.prefix': nameDir+"graph_"+go_term_type, 'useInfo': "all", 'pdfSW': False}
     robjects.r.printGraph(go_data, results, **paramPrint)
 
     GO_ID_INDEX = 0
@@ -131,8 +128,7 @@ def run_topGO(gene_vals, gene_to_go, go_term_type, gene_pval, go_pval, topgo_met
     go_terms.sort()
     return go_terms, results_table, results
 
-def parse_go_map_file(in_handle, genes_w_pvals):
-    gene_list = genes_w_pvals.keys()
+def parse_go_map_file(in_handle):
     gene_to_go = collections.defaultdict(list)
     go_to_gene = collections.defaultdict(list)
     for line in in_handle:
@@ -151,9 +147,9 @@ def parse_go_map_file(in_handle, genes_w_pvals):
 def parse_input_csv(in_handle):
     reader = csv.reader(in_handle)
     reader.__next__() # header
-    all_genes = dict()
-    for (gene_name, _, _, pval) in reader:
-        all_genes[gene_name] = float(pval)
+    all_genes = []
+    for (gene_name,) in reader:
+        all_genes.append(gene_name)
     return all_genes
 
 if __name__ == "__main__":
