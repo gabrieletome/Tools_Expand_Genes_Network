@@ -29,10 +29,31 @@ def print_output_topGO(results_table, results, nameDir, ontology):
     f.close();
     print('Create: '+nameDir+'validation_topGO_'+ontology+'.txt', flush=True)
 
+#Create fasta file
+def createFasta(listGenes, completeFasta, dir):
+    with open(listGenes) as in_handle:
+        genes_list = topGO.parse_input_csv(in_handle)
+    f_complete = open(completeFasta, 'r')
+    completeF = f_complete.read().split('\n')
+    dict_FASTA = {}
+    i = 0
+    while i < len(completeF):
+        if completeF[i][1:] in genes_list:
+            dict_FASTA[completeF[i]] = completeF[i+1]
+        i += 2
+    f_complete.close()
+    namefileFASTA = nameDir+'fasta_'+listGenes.split('/')[-1][:-4]+'.fasta'
+    print(namefileFASTA)
+    f = open(namefileFASTA, 'w')
+    for k in dict_FASTA.keys():
+        f.write(k+'\n'+dict_FASTA[k]+'\n')
+    f.close()
+    return namefileFASTA
+
 def main():
     if len(sys.argv) >= 2:
         if sys.argv[1] == '-topGO':
-            #read parameters
+            #create saving directory
             nameDir = createSavingDir()
             #results_table, results = topGO.topGO_analysis(sys.argv[2], 'import_doc/V1_GOcomplete.txt')
             #Run BP ontology validation
@@ -41,6 +62,15 @@ def main():
             #Run MF ontology validation
             results_table, results = topGO.topGO_analysis(sys.argv[2], sys.argv[3], nameDir, 'MF')
             print_output_topGO(results_table, results, nameDir, 'MF')
+        elif sys.argv[1] == '-dreme':
+            #create saving directory
+            nameDir = createSavingDir()
+            #create fasta file from list of genes
+            fastaFile = createFasta(sys.argv[2], sys.argv[3], nameDir)
+            #execute DREME analisys
+            commandDREME = 'dreme -o '+nameDir+'result_DREME -p '+fastaFile+' -n '+sys.argv[3]
+            print('Execute: '+commandDREME)
+            os.system(commandDREME)
     else:
         print('ERROR: wrong nuomber of parameters')
 
