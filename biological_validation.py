@@ -5,6 +5,20 @@ import rpy2.robjects as ro
 import pandas as pd
 import lib.diffexp_go_analysis as topGO
 
+#Print info about cmd command if the call is wrong
+def printInfo():
+    print('Usage: python3 biological_validation.py PARAM [FILTERS]... LIST_GENES COMPLETE_GENOME')
+    print('PARAM:')
+    print('\t-topGO\tExecute GO validation')
+    print('\t-dreme\tExecute DREME analysis')
+    print('FILTERS (ONLY FOR DREME):')
+    print('\t-exe\t\t\tExecute dreme analysis in local. Without prepare fasta file for DREME website')
+    print('LIST_GENES\tList of genes')
+    print('COMPLETE_GENOME\tComplete file information for validation.')
+    print('\tFor topGO: file map from vitis ID to GO ID')
+    print('\tFor Dreme: complete list of genes in genome')
+    sys.exit(-1)
+
 #Create saving directory
 def createSavingDir():
     #create directory
@@ -65,12 +79,21 @@ def main():
         elif sys.argv[1] == '-dreme':
             #create saving directory
             nameDir = createSavingDir()
-            #create fasta file from list of genes
-            fastaFile = createFasta(sys.argv[2], sys.argv[3], nameDir)
-            #execute DREME analisys
-            commandDREME = 'dreme -o '+nameDir+'result_DREME -p '+fastaFile+' -n '+sys.argv[3]
-            print('Execute: '+commandDREME)
-            os.system(commandDREME)
+            if sys.argv[2] == '-exe':
+                #create fasta file from list of genes
+                fastaFile = createFasta(sys.argv[3], sys.argv[4], nameDir)
+                #execute DREME analisys
+                commandDREME = 'dreme -o '+nameDir+'result_DREME -p '+fastaFile+' -n '+sys.argv[4]
+                print('Execute: '+commandDREME)
+                os.system(commandDREME)
+            else:
+                #create fasta file from list of genes
+                fastaFile = createFasta(sys.argv[2], sys.argv[3], nameDir)
+        elif sys.argv[1] == '--help':
+            printInfo()
+        else:
+            print('ERROR PARAM')
+            printInfo()
     else:
         print('ERROR: wrong nuomber of parameters')
 
