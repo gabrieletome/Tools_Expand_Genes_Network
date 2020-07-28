@@ -57,9 +57,9 @@
 
     BiocManager::install("topGO")
    ```
-   Install DREME: http://meme-suite.org/doc/download.html
+   Install DREME: [DREME tool](http://meme-suite.org/doc/download.html)
    
-##TOOL 1: *managerList.py*
+## TOOL 1: *managerList.py*
 Tool used to build the complete graph of interaction and find the LGN.
 How to use:
 ```
@@ -79,7 +79,7 @@ FILTERS:
   *-i ['comp'/'notcomp']* Ignored edges between isoforms of same gene
 ```
 
-##TOOL 2: *integrateCoupleGenes.py*
+## TOOL 2: *integrateCoupleGenes.py*
 Tool used to expand the LGN.
 How to use:
 ```
@@ -102,7 +102,7 @@ FILES can be a list of .csv or .zip
 ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene. To use only with '-fantom'
 ```
 
-##TOOL 3: *biological_validation.py*
+## TOOL 3: *biological_validation.py*
 Tool that execute biological validation.
 How to use:
 ```
