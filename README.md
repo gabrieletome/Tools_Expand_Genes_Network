@@ -78,6 +78,10 @@ FILTERS:
  ONLY FOR HUMAN GENES:
   '-i ['comp'/'notcomp']' Ignored edges between isoforms of same gene
 ```
+Example with Cuticle genes:
+```
+python3 managerList.py -vitis -f 0.1 -a -files example_lists/Vitis_7genes_MYB-ERF/Example.zip
+```
 
 ## TOOL 2: *integrateCoupleGenes.py*
 Tool used to expand the LGN.
@@ -101,6 +105,10 @@ GENES: file .csv with the genes to analyze. Example: ('CoupleGeneToIntegrate/cou
 FILES can be a list of .csv or .zip
 ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene. To use only with '-fantom'
 ```
+Example with Cuticle genes:
+```
+python3 integrateCoupleGenes.py -vitis -shared -f 0.1 -e -a -files CoupleGeneToIntegrate/coupleGene0.csv example_lists/Vitis_7genes_MYB-ERF/Example.zip
+```
 
 ## TOOL 3: *biological_validation.py*
 Tool that execute biological validation.
@@ -116,3 +124,12 @@ LIST_GENES      List of genes in .csv file.
 COMPLETE_GENOME COmplete file information for validation
  * For topGO: file map from vitis ID to GO ID. ('import_doc/V1_GOcomplete.txt')
  * For Dreme: complete list of genes in genome. ('import_doc/grape_1k_upstream.fasta')
+```
+Example topGO with Cuticle genes:
+```
+python3 biological_validation.py -topGO example_lists/Vitis_7genes_MYB-ERF/topGO_Vitis/MYB_ERF_topGO0.csv import_doc/V1_GOcomplete.txt
+```
+Example DREME with Cuticle genes:
+```
+python3 biological_validation.py -dreme example_lists/Vitis_7genes_MYB-ERF/topGO_Vitis/MYB_ERF_topGO0.csv example_lists/grape_1k_upstream.fasta
+```
