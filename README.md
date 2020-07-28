@@ -66,17 +66,17 @@ How to use:
 Usage: python3 managerList.py PARAM [FILTERS]... -files [FILES]...
 FILES can be a list of .csv or .zip. These are the expansion list from OneGenE
 PARAM:
- *-vitis*  Lists of vitis
- *-human*  Lists of human. Need to be follow by:
-  *-fantom*  Lists from Fantom DB
-  *-TCGA*    Lists from TCGA DB
+ '-vitis'  Lists of vitis
+ '-human'  Lists of human. Need to be follow by:
+  '-fantom'  Lists from Fantom DB
+  '-TCGA'    Lists from TCGA DB
 FILTERS:
- *-a*             Autosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS
- *-f [NUMBER]*    Ignored genes with frel<=NUMBER
+ '-a'             Autosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS
+ '-f [NUMBER]'    Ignored genes with frel<=NUMBER
  ONLY FOR VITIS GENES:
-  *-t [PATTERN,...]*          Take genes that in 'functional annotation' or 'Network1' column there is at least one pattern
+  '-t [PATTERN,...]'          Take genes that in 'functional annotation' or 'Network1' column there is at least one pattern
  ONLY FOR HUMAN GENES:
-  *-i ['comp'/'notcomp']* Ignored edges between isoforms of same gene
+  '-i ['comp'/'notcomp']' Ignored edges between isoforms of same gene
 ```
 
 ## TOOL 2: *integrateCoupleGenes.py*
@@ -85,19 +85,19 @@ How to use:
 ```
 Usage: python3 integrateCoupleGenes.py PARAM TYPEA [FILTERS]... -files [GENES] [FILES]... [ISOFORM]
 PARAM:
- *-vitis*  Lists of vitis
- *-fantom* Lists of fantom DB
- *-TCGA*   Lists of TCGA DB
+ '-vitis'  Lists of vitis
+ '-fantom' Lists of fantom DB
+ '-TCGA'   Lists of TCGA DB
 TYPEA:
- *-frel*        Build expansion network based on FREL. Required filter '*-f*'
- *-rank [INT]*  Build expansion network based on RANK. Take top genes
- *-shared*      Build expansion network based on SHARED GENES
+ '-frel'        Build expansion network based on FREL. Required filter '-f'
+ '-rank [INT]'  Build expansion network based on RANK. Take top genes
+ '-shared'      Build expansion network based on SHARED GENES
 FILTERS:
- *-a*           Autosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS
- *-c*           Add edges between associated genes
- *-e*           Print Venn Diagram and Histogram for complete analysis
- *-f [NUMBER]*  Ignored genes with frel<=NUMBER
-GENES: file .csv with the genes to analyze. Example: (*CoupleGeneToIntegrate/coupleGene.csv*)
+ '-a'           Autosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS
+ '-c'           Add edges between associated genes
+ '-e'           Print Venn Diagram and Histogram for complete analysis
+ '-f [NUMBER]'  Ignored genes with frel<=NUMBER
+GENES: file .csv with the genes to analyze. Example: ('CoupleGeneToIntegrate/coupleGene.csv')
 FILES can be a list of .csv or .zip
 ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene. To use only with '-fantom'
 ```
@@ -108,11 +108,11 @@ How to use:
 ```
 Usage: python3 biological_validation.py PARAM [FILTERS]... LIST_GENES COMPLETE_GENOME
 PARAM:
- *-topGO* Execute GO validation
- *-dreme* Execute DREME analysis
+ '-topGO' Execute GO validation
+ '-dreme' Execute DREME analysis
 FILTERS (ONLY FOR DREME):
- *-exe*  Execute dreme analysis in local. Without prepare fasta file for DREME website
+ '-exe'  Execute dreme analysis in local. Without prepare fasta file for DREME website
 LIST_GENES      List of genes in .csv file.
 COMPLETE_GENOME COmplete file information for validation
- * For topGO: file map from vitis ID to GO ID. (*import_doc/V1_GOcomplete.txt*)
- * For Dreme: complete list of genes in genome. (*import_doc/grape_1k_upstream.fasta*)
+ * For topGO: file map from vitis ID to GO ID. ('import_doc/V1_GOcomplete.txt')
+ * For Dreme: complete list of genes in genome. ('import_doc/grape_1k_upstream.fasta')
