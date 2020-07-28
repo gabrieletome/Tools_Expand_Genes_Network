@@ -131,5 +131,5 @@ python3 biological_validation.py -topGO example_lists/Vitis_7genes_MYB-ERF/topGO
 ```
 Example DREME with Cuticle genes:
 ```
-python3 biological_validation.py -dreme example_lists/Vitis_7genes_MYB-ERF/topGO_Vitis/MYB_ERF_topGO0.csv example_lists/grape_1k_upstream.fasta
+python3 biological_validation.py -dreme example_lists/Vitis_7genes_MYB-ERF/topGO_Vitis/MYB_ERF_topGO0.csv import_doc/grape_1k_upstream.fasta
 ```
