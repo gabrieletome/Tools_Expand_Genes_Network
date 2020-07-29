@@ -74,13 +74,17 @@ FILTERS:
  '-a'             Autosave image of graphs. If -a is present, it save automatically .png. USE IN MICROSOFT WINDOWS
  '-f [NUMBER]'    Ignored genes with frel<=NUMBER
  ONLY FOR VITIS GENES:
-  '-t [PATTERN,...]'          Take genes that in 'functional annotation' or 'Network1' column there is at least one pattern
+  '-t [PATTERN,...]'      Take genes that in 'functional annotation' or 'Network1' column there is at least one pattern
  ONLY FOR HUMAN GENES:
   '-i ['comp'/'notcomp']' Ignored edges between isoforms of same gene
 ```
 Example with Cuticle genes:
 ```
 python3 managerList.py -vitis -f 0.1 -a -files example_lists/Vitis_7genes_MYB-ERF/Example.zip
+```
+Help:
+```
+python3 managerList.py --help
 ```
 
 ## TOOL 2: *integrateCoupleGenes.py*
@@ -109,6 +113,10 @@ Example with Cuticle genes:
 ```
 python3 integrateCoupleGenes.py -vitis -shared -f 0.1 -e -a -files CoupleGeneToIntegrate/coupleGene0.csv example_lists/Vitis_7genes_MYB-ERF/Example.zip
 ```
+Help:
+```
+python3 integrateCoupleGenes.py --help
+```
 
 ## TOOL 3: *biological_validation.py*
 Tool that execute biological validation.
@@ -132,4 +140,8 @@ python3 biological_validation.py -topGO example_lists/Vitis_7genes_MYB-ERF/topGO
 Example DREME with Cuticle genes:
 ```
 python3 biological_validation.py -dreme example_lists/Vitis_7genes_MYB-ERF/topGO_Vitis/MYB_ERF_topGO0.csv import_doc/grape_1k_upstream.fasta
+```
+Help:
+```
+python3 biological_validation.py --help
 ```
