@@ -8,7 +8,7 @@ def main():
     #Minimun 2 parameters: [0] = name file python, [1] = name file of the list of the gene (.csv/.zip)
     if len(sys.argv) >= 2:
         if sys.argv[1] == '--help':
-            printInfo()
+            ut.printInfo()
         elif sys.argv[1] == '-vitis':
             #read parameters
             cmd = ut.readParameters(sys.argv)
