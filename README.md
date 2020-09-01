@@ -8,10 +8,6 @@
    ```
     pip3 install datetime
    ```
-   * *time*
-   ```
-    pip3 install time
-   ```
    * *pandas*
    ```
     pip3 install pandas
@@ -38,16 +34,9 @@
    ```
    * *rpack*
    ```
-    pip3 install rpack
+    pip3 install rectangle-packer
    ```
-   * *copy*
-   ```
-    pip3 install copy
-   ```
-   * *zipfile*
-   ```
-    pip3 install zipfile
-   ```
+
  
  For *biological_validation.py* is required R with [*topGO*](https://bioconductor.org/packages/release/bioc/html/topGO.html) and [DREME](http://meme-suite.org/doc/dreme.html) form MEME suite.
    Install *topGO* library:
