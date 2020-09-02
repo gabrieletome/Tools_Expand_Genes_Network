@@ -230,39 +230,51 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
     #Write legend ID-->GENE
     nameGenes = idNode.keys()
     dictStrToWrite = {}
-    #Read information of Vitis genes
-    f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
-    text = f.readlines()
-    listLineName = []
-    i = 1
-    while i < len(text):
-        listLineName.append(text[i].split(','))
-        i += 1
-    for k in nameGenes:
-        #listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
-        listBR = k.split('<BR>')
-        for elem in listBR:
-            try:
-                if elem in [u[0].upper() for u in listLineName]:
-                    index = [u[0].upper() for u in listLineName].index(elem)
-                    u = listLineName[index]
-                    dictStrToWrite[elem] = str(u[0])+','+str(u[1])+','+str(u[2])+','+str(u[3])+','+str(u[4])+','+str(u[5])
-            except:
-                pass
-    fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
-    print('LEGEND IN: \''+fileOut+'\'')
-    f = open(fileOut, 'w')
-    f.write('ID in graph,'+text[0].split(',')[0]+','+text[0].split(',')[1]+','+text[0].split(',')[2]+','+text[0].split(',')[3]+','+text[0].split(',')[4]+','+text[0].split(',')[5])
-    for k in nameGenes:
-        #listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
-        listBR = k.split('<BR>')
-        for elem in listBR:
-            try:
-                f.write(str(idNode[k])+','+dictStrToWrite[elem])
-            except:
-                pass
-    f.close()
-    
+    if type_gene == 'V':
+        #Read information of Vitis genes
+        f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
+        text = f.readlines()
+        listLineName = []
+        i = 1
+        while i < len(text):
+            listLineName.append(text[i].split(','))
+            i += 1
+        for k in nameGenes:
+            #listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
+            listBR = k.split('<BR>')
+            for elem in listBR:
+                try:
+                    if elem in [u[0].upper() for u in listLineName]:
+                        index = [u[0].upper() for u in listLineName].index(elem)
+                        u = listLineName[index]
+                        dictStrToWrite[elem] = str(u[0])+','+str(u[1])+','+str(u[2])+','+str(u[3])+','+str(u[4])+','+str(u[5])
+                except:
+                    pass
+        fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
+        print('LEGEND IN: \''+fileOut+'\'')
+        f = open(fileOut, 'w')
+        f.write('ID in graph,'+text[0].split(',')[0]+','+text[0].split(',')[1]+','+text[0].split(',')[2]+','+text[0].split(',')[3]+','+text[0].split(',')[4]+','+text[0].split(',')[5])
+        for k in nameGenes:
+            #listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
+            listBR = k.split('<BR>')
+            for elem in listBR:
+                try:
+                    f.write(str(idNode[k])+','+dictStrToWrite[elem])
+                except:
+                    pass
+        f.close()
+    else:
+        #Print legend for human
+        fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
+        print('LEGEND IN: \''+fileOut+'\'')
+        f = open(fileOut, 'w')
+        f.write('ID,NODE\n')
+        tmpList = {}
+        for k in nameGenes:
+            tmpList[idNode[k]] = k
+        for k in sorted(tmpList.keys()):
+            f.write(str(k)+','+tmpList[k]+'\n')
+
     plt.legend(handles=textLegend, fontsize = 'xx-small').set_draggable(True)
     #autoSave PNG or show
     if autoSaveImg:
