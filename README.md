@@ -20,6 +20,10 @@
    ```
     pip3 install matplotlib
    ```
+   * *matplotlib-venn*
+   ```
+    pip3 install matplotlib-venn
+   ```
    * *networkx*
    ```
     pip3 install networkx
