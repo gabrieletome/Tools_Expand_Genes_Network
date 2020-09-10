@@ -231,6 +231,29 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
     nameGenes = idNode.keys()
     dictStrToWrite = {}
     if type_gene == 'V':
+        #UPDATE NAME GENE
+        f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
+        text = f.readlines()
+        listLineName = []
+        i = 1
+        while i < len(text):
+            listLineName.append(text[i].split(','))
+            i += 1
+        listBioNameUpdate = {}
+        for l in listLineName:
+            if l[3] != '':
+                if l[3] not in listBioNameUpdate.values():
+                    listBioNameUpdate[l[0].upper()] = l[3]
+                else:
+                    listBioNameUpdate[l[0].upper()] = l[3]+'_'+l[0].upper()
+            elif l[2] != '':
+                if l[2] not in listBioNameUpdate.values():
+                    listBioNameUpdate[l[0].upper()] = l[2]
+                else:
+                    listBioNameUpdate[l[0].upper()] = l[2]+'_'+l[0].upper()
+            else:
+                listBioNameUpdate[l[0].upper()] = l[0].upper()
+        f.close()
         #Read information of Vitis genes
         f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
         text = f.readlines()
@@ -240,10 +263,11 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
             listLineName.append(text[i].split(','))
             i += 1
         for k in nameGenes:
-            #listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
-            listBR = k.split('<BR>')
+            listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
+            #listBR = k.split('<BR>')
             for elem in listBR:
                 try:
+                    #print([u[0].upper() for u in listLineName])
                     if elem in [u[0].upper() for u in listLineName]:
                         index = [u[0].upper() for u in listLineName].index(elem)
                         u = listLineName[index]
@@ -255,8 +279,8 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
         f = open(fileOut, 'w')
         f.write('ID in graph,'+text[0].split(',')[0]+','+text[0].split(',')[1]+','+text[0].split(',')[2]+','+text[0].split(',')[3]+','+text[0].split(',')[4]+','+text[0].split(',')[5])
         for k in nameGenes:
-            #listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
-            listBR = k.split('<BR>')
+            listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
+            #listBR = k.split('<BR>')
             for elem in listBR:
                 try:
                     f.write(str(idNode[k])+','+dictStrToWrite[elem])

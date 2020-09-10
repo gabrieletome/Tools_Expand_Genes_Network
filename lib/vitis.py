@@ -163,5 +163,7 @@ def printOutput(coreGraph, graphGenes):
     graphGenes = sorted(graphGenes, key=ut.ord)
     ut.printCSV(nameFileCompleteGraph, graphGenes)
     #draw graph in a image
+    for k in list_Genes:
+        list_Genes[list_Genes.index(k)] = listBioNameUpdate[k]
     graphic.drawGraph('V', graphGenes, nameFileCompleteGraph+'_Circular', pearsonComplete, autoSaveImg, list_Genes, 1-min_frel, False, False, True)
     graphic.drawGraph('V', graphGenes, nameFileCompleteGraph, pearsonComplete, autoSaveImg, list_Genes, 1-min_frel, False, True, True)
