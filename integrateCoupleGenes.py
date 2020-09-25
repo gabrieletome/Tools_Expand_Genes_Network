@@ -186,7 +186,8 @@ def main():
             #read each file .csv, read first line, check if is our gene
             #If YES -> go further, If NO -> check next file
             #When we have read all expansion of all gene, manage lists
-            listCouple = utex.readFiles(cmd[0][0])
+            #TODO: Fix better. Take VIT as LGN in input
+            listCouple = [[listBioNameUpdate[elem.upper()] for elem in u] for u in utex.readFiles(cmd[0][0])]
             #find common genes in the lists readed
             listCommonGenes = []
             isoformInEdge = []
