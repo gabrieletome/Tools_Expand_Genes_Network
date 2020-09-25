@@ -118,28 +118,17 @@ def printOutput(coreGraph, graphGenes):
         else:
             listBioNameUpdate[l[0].upper()] = l[0].upper()
     f.close()
-    #update name of genes
-    i = 0
-    while i < len(coreGraph):
-        tmp = coreGraph[i]
-        try:
-            coreGraph[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
-        except:
-            try:
-                coreGraph[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
-            except:
-                coreGraph[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
-        i += 1
+
     i = 0
     while i < len(graphGenes):
-        tmp = graphGenes[i]
-        try:
-            graphGenes[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
-        except:
-            try:
-                graphGenes[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
-            except:
-                graphGenes[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
+        # tmp = graphGenes[i]
+        # try:
+        #     graphGenes[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        # except:
+        #     try:
+        #         graphGenes[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
+        #     except:
+        #         graphGenes[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
         tmp = pearsonComplete[i]
         try:
             pearsonComplete[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
@@ -154,6 +143,19 @@ def printOutput(coreGraph, graphGenes):
     nameFileCore = 'networkOutput/'+printTime+'/Core_Graph'
     coreGraph = sorted(coreGraph, key=ut.ord)
     ut.printCSV(nameFileCore, coreGraph)
+    #update name of genes
+    i = 0
+    while i < len(coreGraph):
+        tmp = coreGraph[i]
+        try:
+            coreGraph[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        except:
+            try:
+                coreGraph[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
+            except:
+                coreGraph[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
+        i += 1
+    coreGraph = sorted(coreGraph, key=ut.ord)
     #draw graph in a image
     graphic.drawGraph('V', coreGraph, nameFileCore+'_Circular', pearsonComplete, autoSaveImg, [], 1-min_frel, False, False, True)
     graphic.drawGraph('V', coreGraph, nameFileCore, pearsonComplete, autoSaveImg, [], 1-min_frel, False, True, True)
@@ -162,6 +164,19 @@ def printOutput(coreGraph, graphGenes):
     nameFileCompleteGraph = 'networkOutput/'+printTime+'/Complete_Graph'
     graphGenes = sorted(graphGenes, key=ut.ord)
     ut.printCSV(nameFileCompleteGraph, graphGenes)
+    #update name
+    i = 0
+    while i < len(graphGenes):
+        tmp = graphGenes[i]
+        try:
+            graphGenes[i] = (listBioNameUpdate[tmp[0]], listBioNameUpdate[tmp[1]], tmp[2])
+        except:
+            try:
+                graphGenes[i] = (tmp[0], listBioNameUpdate[tmp[1]], tmp[2])
+            except:
+                graphGenes[i] = (listBioNameUpdate[tmp[0]], tmp[1], tmp[2])
+        i += 1
+    graphGenes = sorted(graphGenes, key=ut.ord)
     #draw graph in a image
     for k in list_Genes:
         list_Genes[list_Genes.index(k)] = listBioNameUpdate[k]
