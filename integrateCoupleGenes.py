@@ -188,7 +188,7 @@ def main():
             #When we have read all expansion of all gene, manage lists
             #TODO: Fix better. Take VIT as LGN in input
             try:
-                listCouple = [[listBioNameUpdate[elem.upper()] for elem in u] for u in utex.readFiles(cmd[0][0])]
+                listCouple = [[listBioNameUpdate[elem.strip().upper()] for elem in u] for u in utex.readFiles(cmd[0][0])]
             except:
                 listCouple = utex.readFiles(cmd[0][0])
             #find common genes in the lists readed
@@ -320,11 +320,18 @@ def main():
                 if vitis: #TODO: manage Pearson Correlation if expansion with GT-001
                     #listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:]]
                     #TODEL_GT-001
+                    dictConvert = {}
+                    for elem in l[1:]:
+                        if elem[0] != 'GT-001':
+                            dictConvert[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[0])])] = elem[0]
+                        if elem[2] != 'GT-001':
+                            dictConvert[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[2])])] = elem[2]
                     listForPearson = [((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),d) for (a,b,c,d) in l[1:] if a != 'GT-001' and c != 'GT-001']
                     tmp = utex.manageBR(ut.pearsonCorrelation(listForPearson, 'vv_exprdata_2.csv'))
                     #pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]
                     #TODEL_GT-001
-                    pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]+[((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),1) for (a,b,c,d) in l[1:] if a == 'GT-001' or c == 'GT-001']
+                    #pearson = [(listBioNameUpdate[u],listBioNameUpdate[v],p) for (u,v,p) in tmp]+[((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),1) for (a,b,c,d) in l[1:] if a == 'GT-001' or c == 'GT-001']
+                    pearson = [(dictConvert[[w for w in u.split('<BR>') if w in dictConvert.keys()][0]],dictConvert[[w for w in v.split('<BR>') if w in dictConvert.keys()][0]],p) for (u,v,p) in tmp]+[((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),1) for (a,b,c,d) in l[1:] if a == 'GT-001' or c == 'GT-001']
                     pearsonComplete.append(pearson)
                 else:
                     listForPearson = [(a,c,d) for (a,b,c,d) in l[1:]]

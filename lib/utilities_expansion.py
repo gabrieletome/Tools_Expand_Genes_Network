@@ -260,12 +260,12 @@ def printNumberVenn(listCommonGenes, nameDir):
         nameF = nameF.replace("<", "_")
         nameF = nameF.replace(">", "_")
         nameDirGenes = nameDir+str(i)+'/'
-        f = open(nameDirGenes+'venn_number_'+nameF+'.txt', 'w')
+        f = open(nameDirGenes+'venn_number.txt', 'w')
         f.write('---> NUMBER GENES IN \''+nameF+'\': '+str(int(len([u for u in listCommonGenes[0][i][1:] if not (u[0] in listCommonGenes[0][i][0] and u[2] in listCommonGenes[0][i][0])])/len(listCommonGenes[0][i][0])))+'\n')
         listKey = sorted([u for u in listCommonGenes[1][i].keys()], key=len)
         #listKey = sorted([u for u in listCommonGenes[1][i].keys() if len(u.split(',')) == 1], key=len)
         #listKey = sorted([(re.findall(r'\w+', u)) for u in listCommonGenes[1][i].keys()], key=len)
-        for key in listKey:
+        for key in listKey[:-1]:
             nameFile = ''
             for g in sorted(key.split('\'')):
                 if len(g) > 4:
@@ -276,7 +276,7 @@ def printNumberVenn(listCommonGenes, nameDir):
 
             f.write('---> NUMBER GENES IN \''+nameFile+'\': '+str(int(len(listCommonGenes[1][i][str(key)])/len(nameFile.split('_'))))+'\n')
         f.close()
-        print('Create: \''+nameF+'/venn_number_'+nameF+'.txt\'', flush=True)
+        print('Create: \''+nameDirGenes+'venn_number.txt\'', flush=True)
         i += 1
 
 #Trasform directed graph in undirected
@@ -601,24 +601,34 @@ def printCSV(edgesGraph, listForVenn, nameDir,listBioNameUpdate):
                 nameF += '_'+g.split('\'')[1]
         #Print .csv for each combination of genes of LGN. They contain the list of genes associated to that combination
         #FIX
+        i = 2
+        dictNumFile = {}
+        while i < lenMax:
+            dictNumFile[i] = 1
+            i += 1
         for key in listKey:
             if len(key.split(',')) != lenMax:
-                nameFile = ''
-                for g in sorted(key.split('\'')):
-                    if len(g) > 4:
-                        if nameFile == '':
-                            nameFile = g
-                        else:
-                            nameFile += '_'+g
-                nameF = nameF.replace("<", "_")
-                nameF = nameF.replace(">", "_")
-                nameFile = nameFile.replace("<", "_")
-                nameFile = nameFile.replace(">", "_")
-                f = open(nameDir+str(listForVenn.index(k))+'/'+nameFile+'.csv', 'w')
+                if len(key.split(',')) == 1:
+                    nameFile = ''
+                    for g in sorted(key.split('\'')):
+                        if len(g) > 4:
+                            if nameFile == '':
+                                nameFile = g
+                            else:
+                                nameFile += '_'+g
+                    nameF = nameF.replace("<", "_")
+                    nameF = nameF.replace(">", "_")
+                    nameFile = nameFile.replace("<", "_")
+                    nameFile = nameFile.replace(">", "_")
+                    f = open(nameDir+str(listForVenn.index(k))+'/'+nameFile+'.csv', 'w')
+                else:
+                    f = open(nameDir+str(listForVenn.index(k))+'/intersectionOF'+str(len(key.split(',')))+'genes'+str(dictNumFile[len(key.split(','))])+'.csv', 'w')
+                    dictNumFile[len(key.split(','))] = dictNumFile[len(key.split(','))]+1
                 f.write(nameFile+',rank,frel,'+lineIntro+'\n')
-                #print(k)
                 for elem in k[str(key)]:
-                    f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[2])])]+'\n')
-                    #f.write(str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n')
+                    try:
+                        f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[2])])]+'\n')
+                    except:
+                        f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+str(elem[2])+'\n')
 
                 f.close()

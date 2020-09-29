@@ -322,9 +322,9 @@ def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, auto
     for l in listCommonGenes:
         #nameFile
         nameF = utex.buildNamefile(l)
-        namefile = nameDir+str(listCommonGenes.index(l))+'/graph_'+nameF
+        namefile = nameDir+str(listCommonGenes.index(l))+'/graphGenes'
         #set name of window and change parameters of save image
-        plt.figure('graph_'+nameF)
+        plt.figure('graph')
         mpl.rcParams['savefig.directory'] = nameDir+nameF
         mpl.rcParams['savefig.dpi'] = 700
         #build edges of graph
@@ -483,7 +483,7 @@ def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, auto
             namefile = namefile.replace("<", "_")
             namefile = namefile.replace(">", "_")
             plt.savefig(namefile+'.png')
-            print('Create: \''+nameF+'/graph_'+nameF+'.png\'', flush=True)
+            print('Create: \'graphGenes.png\'', flush=True)
         else:
             plt.show()
         #Clean graph and pyplot
@@ -511,8 +511,8 @@ def printVenn(listForVenn, couples, nameDir):
             nameF = nameF.replace(">", "_")
             nameUnifyGenes = nameUnifyGenes.replace("<", "_")
             nameUnifyGenes = nameUnifyGenes.replace(">", "_")
-            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png')
-            print('Create: \''+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png\'')
+            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
+            print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
         #Draw venn diagram with 3 sets
         if len(couples[listForVenn.index(k)]) == 3:
             elemSubSets = ('',)
@@ -529,8 +529,8 @@ def printVenn(listForVenn, couples, nameDir):
             nameF = nameF.replace(">", "_")
             nameUnifyGenes = nameUnifyGenes.replace("<", "_")
             nameUnifyGenes = nameUnifyGenes.replace(">", "_")
-            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png')
-            print('Create: \''+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png\'')
+            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
+            print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
         #Draw Venn diagram with 4 sets
         if len(couples[listForVenn.index(k)]) == 4:
             #made all possible combination of genes
@@ -584,8 +584,8 @@ def printVenn(listForVenn, couples, nameDir):
             nameF = nameF.replace(">", "_")
             nameUnifyGenes = nameUnifyGenes.replace("<", "_")
             nameUnifyGenes = nameUnifyGenes.replace(">", "_")
-            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png')
-            print('Create: \''+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png\'')
+            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
+            print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
 
         #Draw Venn diagram with 5 sets
         if len(couples[listForVenn.index(k)]) == 5:
@@ -663,8 +663,8 @@ def printVenn(listForVenn, couples, nameDir):
             nameF = nameF.replace(">", "_")
             nameUnifyGenes = nameUnifyGenes.replace("<", "_")
             nameUnifyGenes = nameUnifyGenes.replace(">", "_")
-            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png')
-            print('Create: \''+str(listForVenn.index(k))+'/venn_'+nameUnifyGenes+'.png\'')
+            plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
+            print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
         plt.clf()
         plt.close()
 
@@ -760,8 +760,8 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
         plt.gcf().set_size_inches(15, 10)
         nameF = nameF.replace("<", "_")
         nameF = nameF.replace(">", "_")
-        plt.savefig(nameDirGenes+'histogram_'+nameF+'.png')
-        print('Create: \''+nameF+'/histogram_'+nameF+'.png\'')
+        plt.savefig(nameDirGenes+'histogram.png')
+        print('Create: \''+nameDirGenes+'histogram.png\'')
         # plt.gcf().set_size_inches(tmp)
         plt.clf()
         plt.close()
