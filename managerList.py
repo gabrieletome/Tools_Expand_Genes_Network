@@ -29,7 +29,7 @@ def main():
             #check the DB
             fantom = False
             if sys.argv[2] == '-fantom':
-                fantom = True
+                pass# fantom = True
             elif sys.argv[2] == '-TCGA':
                 pass
             else:

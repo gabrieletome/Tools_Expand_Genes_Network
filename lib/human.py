@@ -61,7 +61,7 @@ def buildMatrixGenesHuman(listFilter, listFiles, fantom):
                             csvText = csvText.split(r'"')
                         else:
                             csvText = csvText.split('\'')
-                        csvText = csvText[0]
+                        csvText = csvText[1]
                         csvListText = csvText.split(r'\n')
                         csvTemp = open(namefilezip, 'w')
                         for l in csvListText:

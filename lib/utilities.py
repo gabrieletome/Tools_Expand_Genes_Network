@@ -219,8 +219,8 @@ def pearsonCorrelation(edges, file):
     f.close()
     edgeCorrValue = []
     for k in edges:
-        line1 = []
-        line2 = []
+        line1 = [k[0]]
+        line2 = [k[1]]
         i = 0
         while i < len(lineCorr):
             if k[0] in lineCorr[i][0]:
@@ -228,7 +228,10 @@ def pearsonCorrelation(edges, file):
             if k[1] in lineCorr[i][0]:
                 line2 = lineCorr[i]
             i += 1
-        edgeCorrValue.append((line1[0], line2[0], (stat.pearsonr(line1[1:], line2[1:]))[0]))
+        try:
+            edgeCorrValue.append((line1[0], line2[0], (stat.pearsonr(line1[1:], line2[1:]))[0]))
+        except:
+            edgeCorrValue.append((line1[0], line2[0], 0))
     return edgeCorrValue
 
 #Read file .csv

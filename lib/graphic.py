@@ -289,15 +289,27 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
         f.close()
     else:
         #Print legend for human
+        f = open('import_doc/anno-hsf5.csv', 'r')
+        text = f.readlines()
+        listLineName = {}
+        i = 1
+        while i < len(text):
+            tmpLine = text[i].split(',')
+            if '@'+tmpLine[5][1:-1] in nameGenes:
+                listLineName['@'+tmpLine[5][1:-1]] = ','.join([str(elem) for elem in tmpLine[1:]])
+            i += 1
         fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
         print('LEGEND IN: \''+fileOut+'\'')
         f = open(fileOut, 'w')
-        f.write('ID,NODE\n')
+        f.write('ID,NODE,association_with_transcript,entrezgene_id,hgnc_id,uniprot_id,gene_name,description,type\n')
         tmpList = {}
         for k in nameGenes:
             tmpList[idNode[k]] = k
         for k in sorted(tmpList.keys()):
-            f.write(str(k)+','+tmpList[k]+'\n')
+            try:
+                f.write(str(k)+','+tmpList[k]+','+listLineName[tmpList[k]])
+            except:
+                f.write(str(k)+','+tmpList[k]+'\n')
 
     plt.legend(handles=textLegend, fontsize = 'xx-small').set_draggable(True)
     #autoSave PNG or show
@@ -446,35 +458,61 @@ def printCommonGraph(listCommonGenes, pearsonComplete, range_frel, nameDir, auto
         nameGenes = idNode.keys()
         dictStrToWrite = {}
         #Read information of Vitis genes
-        f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
+            # f = open('import_doc/NewAnnotVitisnet3.csv', 'r')
+            # text = f.readlines()
+            # listLineName = []
+            # i = 1
+            # while i < len(text):
+            #     listLineName.append(text[i].split(','))
+            #     i += 1
+            # for k in nameGenes:
+            #     listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
+            #     for elem in listBR:
+            #         try:
+            #             if elem in [u[0].upper() for u in listLineName]:
+            #                 index = [u[0].upper() for u in listLineName].index(elem)
+            #                 u = listLineName[index]
+            #                 dictStrToWrite[elem] = str(u[0])+','+str(u[1])+','+str(u[2])+','+str(u[3])+','+str(u[4])+','+str(u[5])
+            #         except:
+            #             pass
+            # fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
+            # print('LEGEND IN: \''+fileOut+'\'')
+            # f = open(fileOut, 'w')
+            # f.write('ID in graph,'+text[0].split(',')[0]+','+text[0].split(',')[1]+','+text[0].split(',')[2]+','+text[0].split(',')[3]+','+text[0].split(',')[4]+','+text[0].split(',')[5])
+            # for k in nameGenes:
+            #     listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
+            #     for elem in listBR:
+            #         try:
+            #             f.write(str(idNode[k])+','+dictStrToWrite[elem])
+            #         except:
+            #             pass
+            # f.close()
+        #Print legend for human
+        f = open('import_doc/anno-hsf5.csv', 'r')
         text = f.readlines()
-        listLineName = []
+        listLineName = {}
         i = 1
         while i < len(text):
-            listLineName.append(text[i].split(','))
+            tmpLine = text[i].split(',')
+            listGene = [u for u in nameGenes if '@' not in u]+[u.split('@')[1] for u in nameGenes if '@' in u]
+            if tmpLine[5][1:-1] in listGene:
+                listLineName[tmpLine[5][1:-1]] = ','.join([str(elem) for elem in tmpLine[1:]])
             i += 1
-        for k in nameGenes:
-            listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
-            for elem in listBR:
-                try:
-                    if elem in [u[0].upper() for u in listLineName]:
-                        index = [u[0].upper() for u in listLineName].index(elem)
-                        u = listLineName[index]
-                        dictStrToWrite[elem] = str(u[0])+','+str(u[1])+','+str(u[2])+','+str(u[3])+','+str(u[4])+','+str(u[5])
-                except:
-                    pass
         fileOut = namefile.split('graph')[0]+'graph_legend_ID_NAME.csv'
         print('LEGEND IN: \''+fileOut+'\'')
         f = open(fileOut, 'w')
-        f.write('ID in graph,'+text[0].split(',')[0]+','+text[0].split(',')[1]+','+text[0].split(',')[2]+','+text[0].split(',')[3]+','+text[0].split(',')[4]+','+text[0].split(',')[5])
+        f.write('ID,NODE,association_with_transcript,entrezgene_id,hgnc_id,uniprot_id,gene_name,description,type\n')
+        tmpList = {}
         for k in nameGenes:
-            listBR = (list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k)]).split('<BR>')
-            for elem in listBR:
-                try:
-                    f.write(str(idNode[k])+','+dictStrToWrite[elem])
-                except:
-                    pass
-        f.close()
+            tmpList[idNode[k]] = k
+        for k in sorted(tmpList.keys()):
+            try:
+                if '@' not in tmpList[k]:
+                    f.write(str(k)+','+tmpList[k]+','+listLineName[tmpList[k]])
+                else:
+                    f.write(str(k)+','+tmpList[k]+','+listLineName[tmpList[k].split('@')[1]])
+            except:
+                f.write(str(k)+','+tmpList[k]+'\n')
 
         #textLegend.append(mlines.Line2D([], [], label='in \''+(fileOut.split('/'))[-1]+'\'', visible=False))
         plt.legend(handles=textLegend, fontsize = 'xx-small').set_draggable(True)
