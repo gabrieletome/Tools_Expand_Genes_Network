@@ -327,6 +327,13 @@ def printOutput(coreGraph, graphGenes, graphGenesOld):
 
     print('Calculating Pearson Correlation complete', flush=True)
 
+    #RETURN GRAPH
+    nameFileCompleteGraph = 'networkOutput/'+printTime+'/Complete_Graph'
+    graphGenes = sorted(graphGenes, key=ut.ord)
+    ut.printCSV(nameFileCompleteGraph, graphGenes)
+    #draw graph in a image
+    graphic.drawGraph('H', graphGenes, nameFileCompleteGraph+'_Circular', pearsonComplete, autoSaveImg, list_Genes, 1-min_frel, comprimeNode, False, typeDB)
+    graphic.drawGraph('H', graphGenes, nameFileCompleteGraph, pearsonComplete, autoSaveImg, list_Genes, 1-min_frel, comprimeNode, True, typeDB)
     #RETURN CORE
     nameFileCore = 'networkOutput/'+printTime+'/Core_Graph'
     coreGraph = sorted(coreGraph, key=ut.ord)
@@ -335,13 +342,7 @@ def printOutput(coreGraph, graphGenes, graphGenesOld):
     graphic.drawGraph('H', coreGraph, nameFileCore+'_Circular', pearsonComplete, autoSaveImg, [], 1-min_frel, comprimeNode, False, typeDB)
     graphic.drawGraph('H', coreGraph, nameFileCore, pearsonComplete, autoSaveImg, [], 1-min_frel, comprimeNode, True, typeDB)
 
-    #RETURN GRAPH
-    nameFileCompleteGraph = 'networkOutput/'+printTime+'/Complete_Graph'
-    graphGenes = sorted(graphGenes, key=ut.ord)
-    ut.printCSV(nameFileCompleteGraph, graphGenes)
-    #draw graph in a image
-    graphic.drawGraph('H', graphGenes, nameFileCompleteGraph+'_Circular', pearsonComplete, autoSaveImg, list_Genes, 1-min_frel, comprimeNode, False, typeDB)
-    graphic.drawGraph('H', graphGenes, nameFileCompleteGraph, pearsonComplete, autoSaveImg, list_Genes, 1-min_frel, comprimeNode, True, typeDB)
+
 
 def removeIsoformEdges(edges):
     if ignoreEdgesIsoform and not comprimeNode:

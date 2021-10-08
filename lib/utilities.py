@@ -125,6 +125,7 @@ def buildGraph(mGenes):
             j = 0
         i += 1
         j = 0
+
     return graph
 
 #Trasform directed graph in undirected
@@ -169,27 +170,30 @@ def findCoreGraph(completeGraph):
         if k[1] not in idNode:
             idNode[k[1]] = i
             i += 1
-    #call Charikar's Algorithm to find the core
-    lIdCore = charikarAlgorithm.findCoreNetwork(completeGraph)
-    #transform idNode to name of gene
-    lCore = []
-    for elem in lIdCore:
-        lCore.append(list(idNode.keys())[list(idNode.values()).index(elem)])
-    #create list with edges between nodes of core
-    core = []
-    max = len(lCore)
-    i = 0
-    j = 1
-    while i < len(lCore):
-        wNode1 = lCore[i]
-        while j < len(lCore):
-            wNode2 = lCore[j]
-            for edge in completeGraph:
-                if wNode1 == edge[0] and wNode2 == edge[1] or wNode1 == edge[1] and wNode2 == edge[0]:
-                    core.append(edge)
-            j += 1
-        i += 1
-        j = i
+    if len(completeGraph) > 1:
+        #call Charikar's Algorithm to find the core
+        lIdCore = charikarAlgorithm.findCoreNetwork(completeGraph)
+        #transform idNode to name of gene
+        lCore = []
+        for elem in lIdCore:
+            lCore.append(list(idNode.keys())[list(idNode.values()).index(elem)])
+        #create list with edges between nodes of core
+        core = []
+        max = len(lCore)
+        i = 0
+        j = 1
+        while i < len(lCore):
+            wNode1 = lCore[i]
+            while j < len(lCore):
+                wNode2 = lCore[j]
+                for edge in completeGraph:
+                    if wNode1 == edge[0] and wNode2 == edge[1] or wNode1 == edge[1] and wNode2 == edge[0]:
+                        core.append(edge)
+                j += 1
+            i += 1
+            j = i
+    else:
+        core=completeGraph
     return core
 
 #function to ord list of edges
@@ -253,9 +257,9 @@ def readFilesVitis(filename, typeDB):
     for line in listLine:
         listCells.append(line.split(','))
     #Name of the gene is in cell in row 0, column 3
-    if typeDB:
+    try:
         nameGene = (listCells[0][3].split('-'))[0]
-    else:
+    except:
         nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[0])  #fantom
         if nameGene == 'TCGAz':
             nameGene = ((((listCells[0][0].split(' '))[3]).split('-'))[1])  #TCGA

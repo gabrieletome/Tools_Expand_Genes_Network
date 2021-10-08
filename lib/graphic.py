@@ -45,7 +45,6 @@ def drawGraph(type_gene, net, namefile, pearson, autoSaveImg, list_Genes, range_
     #code to define colors for each isoform. Only for Human genes
     dict_isoColor = {}
     if type_gene == 'H' and not comprimeNode:
-        # print(idNode.keys())
         if list(idNode.keys())[0][0] == '@':
             for k in list_Genes:
                 if '@' in k:

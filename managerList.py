@@ -38,6 +38,7 @@ def main():
             #read parameters
             cmd = ut.readParameters(sys.argv)
             #build matrix of genes
+            print(fantom)
             matrixGenes = human.buildMatrixGenesHuman(cmd[0], cmd[1], fantom)
             print('Build matrix successfully', flush=True)
             #build graph of interaction between genes
