@@ -191,6 +191,7 @@ def main():
                 listCouple = [[listBioNameUpdate[elem.strip().upper()] for elem in u] for u in utex.readFiles(cmd[0][0])]
             except:
                 listCouple = utex.readFiles(cmd[0][0])
+
             #find common genes in the lists readed
             listCommonGenes = []
             isoformInEdge = []

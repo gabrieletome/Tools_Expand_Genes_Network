@@ -24,7 +24,7 @@ def printInfo():
     print('\t-f [NUMBER]\t\tIgnored genes with frel<=NUMBER')
     print('GENES: file .csv with the genes to analyze. Example: \'CoupleGeneToIntegrate/coupleGene.csv\'')
     print('FILES can be a list of .csv or .zip')
-    print('ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene.\n\tTo use only with \'-fantom\'')
+    print('ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene (tag \'-i comp\').\n\tTo use only with \'-fantom\'')
     sys.exit(-1)
 
 #Manager to read and filter files
@@ -438,7 +438,7 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
         #save name isoform of lists in a dictionary to improve the performance
         for l in isoformToSearch:
             for n in l:
-                tmpIsoform = n.split('<--->')
+                tmpIsoform = n.split('<-->')
                 for iso in tmpIsoform:
                     listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
         for f in listFiles:

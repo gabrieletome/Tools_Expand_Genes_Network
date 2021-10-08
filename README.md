@@ -41,7 +41,7 @@
     pip3 install rectangle-packer
    ```
 
- 
+
  For *biological_validation.py* is required R with [*topGO*](https://bioconductor.org/packages/release/bioc/html/topGO.html) and [DREME](http://meme-suite.org/doc/dreme.html) form MEME suite.
    Install *topGO* library:
    ```
@@ -51,7 +51,7 @@
     BiocManager::install("topGO")
    ```
    Install DREME: [DREME tool](http://meme-suite.org/doc/download.html)
-   
+
 ## TOOL 1: *managerList.py*
 Tool used to build the complete graph of interaction and find the LGN.
 How to use:
@@ -74,6 +74,9 @@ FILTERS:
 Example with Cuticle genes:
 ```
 python3 managerList.py -vitis -f 0.1 -a -files example_lists/Vitis_7genes_MYB-ERF/Example.zip
+```
+```
+python3 managerList.py -human -fantom -f 0.5 -a -i comp -files example_lists/Human_22genes_cancer/Fantom/Fantom.zip
 ```
 Help:
 ```
@@ -100,11 +103,14 @@ FILTERS:
  '-f [NUMBER]'  Ignored genes with frel<=NUMBER
 GENES: file .csv with the genes to analyze. Example: ('CoupleGeneToIntegrate/coupleGene.csv')
 FILES can be a list of .csv or .zip
-ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene. To use only with '-fantom'
+ISOFORM: file .csv from the execution of ManagerList.py with the composition of edge gene-gene (tag '-i comp'). To use only with '-fantom'
 ```
 Example with Cuticle genes:
 ```
 python3 integrateCoupleGenes.py -vitis -shared -f 0.1 -e -a -files CoupleGeneToIntegrate/coupleGene0.csv example_lists/Vitis_7genes_MYB-ERF/Example.zip
+```
+```
+python3 integrateCoupleGenes.py -fantom -shared -a -e -f 0.1 -files CoupleGeneToIntegrate/coupleGene.csv example_lists/Human_22genes_cancer/Fantom/Fantom.zip networkOutput/*dateExecutionTool1*/isoformInEdge.csv
 ```
 Help:
 ```
