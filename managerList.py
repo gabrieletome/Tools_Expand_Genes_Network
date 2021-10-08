@@ -52,7 +52,7 @@ def main():
             coreGraph = ut.findCoreGraph(graphGenes)
             print('Core find successufully', flush=True)
             #print in output complete graph and core
-            human.printOutput(coreGraph, graphGenes, graphGenesOld, fantom)
+            human.printOutput(coreGraph, graphGenes, graphGenesOld)
         else:
             print('ERROR: Need 1 parameters')
             print('Usage: python3 managerList.py PARAM [FILTERS]... -files [FILES]...')

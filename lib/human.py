@@ -258,7 +258,7 @@ def indexDictGene(g, listStr):
     return listIndex
 
 #Print in output the graphs
-def printOutput(coreGraph, graphGenes, graphGenesOld, typeDB):
+def printOutput(coreGraph, graphGenes, graphGenesOld):
     if not os.path.exists('networkOutput'):
         os.mkdir('networkOutput')
     #write graph in a .txt file
