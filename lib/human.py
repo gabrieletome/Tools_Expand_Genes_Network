@@ -258,7 +258,7 @@ def indexDictGene(g, listStr):
     return listIndex
 
 #Print in output the graphs
-def printOutput(coreGraph, graphGenes, graphGenesOld):
+def printOutput(coreGraph, graphGenes, graphGenesOld, typeDB):
     if not os.path.exists('networkOutput'):
         os.mkdir('networkOutput')
     #write graph in a .txt file
@@ -284,7 +284,7 @@ def printOutput(coreGraph, graphGenes, graphGenesOld):
             for k in [(a, b) for a in listIndex1 for b in listIndex2]:
                 if k in listEdgesOriginalGraph:
                     fIsoEdges.write('> '+str(listBioNameUpdate[k[0]])+' - '+str(listBioNameUpdate[k[1]])+'\n')
-                    fIsoEdgesCSV.write(','+str(listBioNameUpdate[k[0]])+'-'+str(listBioNameUpdate[k[1]]))
+                    fIsoEdgesCSV.write(','+str(listBioNameUpdate[k[0]])+'<-->'+str(listBioNameUpdate[k[1]]))
                     numberIsoformPerEdges += 1
                     prePearson[k] = 1
             fIsoEdges.write('NUMBER OF EDGES: '+str(numberIsoformPerEdges)+'\n\n')

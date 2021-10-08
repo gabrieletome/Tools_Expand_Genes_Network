@@ -746,7 +746,7 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
                 #save name isoform of lists in a dictionary to improve the performance
                 for isoS in isoformToSearch:
                     for n in isoS:
-                        tmpIsoform = n.split('-')
+                        tmpIsoform = n.split('<-->')
                         for iso in tmpIsoform:
                             listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
 

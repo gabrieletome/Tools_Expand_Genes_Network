@@ -231,6 +231,7 @@ def main():
                 listCommonGenes = utex.findCommonGenesFantom(listCouple, listFiles, isoformInEdge)
                 if typeAnalyze == 0 or typeAnalyze == 1: #frel or rank
                     edgesGraph = utex.buildEdgesFrelRankIsoform(listCouple, listFiles, isoformInEdge)
+                    edgesGraph = [[lgn[0]]+[(a,b,c,d) for (a,b,c,d) in lgn[1:] if a != c.split('@')[1]] for lgn in edgesGraph]
                 elif typeAnalyze == 2:
                     edgesGraph = listCommonGenes[0]
 

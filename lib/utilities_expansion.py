@@ -419,12 +419,14 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
         edgeBetweenGenesLGN = []
         numberEdgesBetweenGeneCouple = 0
         while i < len(c):
-            numberEdgesBetweenGeneCouple += len(c)-i-1
+            # numberEdgesBetweenGeneCouple += len(c)-i-1
             while j < len(c):
                 if (c[i], c[j]) in edgesNodes:
                     isoformToSearch.append((isoformInEdge[edgesNodes.index((c[i], c[j]))])[2:])
+                    numberEdgesBetweenGeneCouple += 1
                 if (c[j], c[i]) in edgesNodes:
                     isoformToSearch.append((isoformInEdge[edgesNodes.index((c[j], c[i]))])[2:])
+                    numberEdgesBetweenGeneCouple += 1
                 j += 1
             i += 1
             j = i+1
@@ -534,7 +536,7 @@ def buildEdgesFrelRankIsoform(listCouple, listFiles, isoformInEdge):
         #save name isoform of lists in a dictionary to improve the performance
         for l in isoformToSearch:
             for n in l:
-                tmpIsoform = n.split('-')
+                tmpIsoform = n.split('<-->')
                 for iso in tmpIsoform:
                     listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
         #TODO FIX
@@ -588,6 +590,8 @@ def printCSV(edgesGraph, listForVenn, nameDir,listBioNameUpdate):
                 f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+dictStrToWrite[(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem[2])])]+'\n')
             except:
                 f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+str(elem[2])+'\n')#
+                #f.write(str(elem[0])+','+str(elem[1])+','+str(elem[3])+','+elem[2]+'\n')
+            #
             # string = str(elem[0])+','+str(elem[1])+','+str(elem[2])+','+str(elem[3])+'\n'
             # f.write(string)
         f.close();

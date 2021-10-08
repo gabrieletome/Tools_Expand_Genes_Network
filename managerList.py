@@ -29,7 +29,7 @@ def main():
             #check the DB
             fantom = False
             if sys.argv[2] == '-fantom':
-                pass# fantom = True
+                fantom = True
             elif sys.argv[2] == '-TCGA':
                 pass
             else:
@@ -52,7 +52,7 @@ def main():
             coreGraph = ut.findCoreGraph(graphGenes)
             print('Core find successufully', flush=True)
             #print in output complete graph and core
-            human.printOutput(coreGraph, graphGenes, graphGenesOld)
+            human.printOutput(coreGraph, graphGenes, graphGenesOld, fantom)
         else:
             print('ERROR: Need 1 parameters')
             print('Usage: python3 managerList.py PARAM [FILTERS]... -files [FILES]...')
