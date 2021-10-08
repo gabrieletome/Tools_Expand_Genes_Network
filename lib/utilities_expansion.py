@@ -438,7 +438,7 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
         #save name isoform of lists in a dictionary to improve the performance
         for l in isoformToSearch:
             for n in l:
-                tmpIsoform = n.split('-')
+                tmpIsoform = n.split('<--->')
                 for iso in tmpIsoform:
                     listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
         for f in listFiles:
