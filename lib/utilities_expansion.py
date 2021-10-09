@@ -449,8 +449,11 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
                         edgeBetweenGenesLGN.append(((f[0].split('@'))[1], elem[0], (elem[1].split('@'))[1], elem[2]))
                     dictGeneToSave[nGene] = []
                     for g in c:
-                        if nGene in ((listDictGenesFiles[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]])[1]).keys():
-                            dictGeneToSave[nGene] = dictGeneToSave[nGene]+[g]
+                        try:
+                            if nGene in ((listDictGenesFiles[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]])[1]).keys():
+                                dictGeneToSave[nGene] = dictGeneToSave[nGene]+[g]
+                        except:
+                            pass
         #for key in dictGeneToSave.keys():
         #create innerListForVenn[] for every possible combination of the genes in couples
         keys = []
