@@ -268,7 +268,7 @@ def printNumberVenn(listCommonGenes, nameDir):
         for key in listKey[:-1]:
             nameFile = ''
             for g in sorted(key.split('\'')):
-                if len(g) >= 2:
+                if len(g) > 2:
                     if nameFile == '':
                         nameFile = g
                     else:
@@ -620,18 +620,18 @@ def printCSV(edgesGraph, listForVenn, nameDir,listBioNameUpdate):
             i += 1
         for key in listKey:
             if len(key.split(',')) != lenMax:
+                nameFile = ''
+                for g in sorted(key.split('\'')):
+                    if len(g) > 2:
+                        if nameFile == '':
+                            nameFile = g
+                        else:
+                            nameFile += '_'+g
+                nameF = nameF.replace("<", "_")
+                nameF = nameF.replace(">", "_")
+                nameFile = nameFile.replace("<", "_")
+                nameFile = nameFile.replace(">", "_")
                 if len(key.split(',')) == 1:
-                    nameFile = ''
-                    for g in sorted(key.split('\'')):
-                        if len(g) >= 2:
-                            if nameFile == '':
-                                nameFile = g
-                            else:
-                                nameFile += '_'+g
-                    nameF = nameF.replace("<", "_")
-                    nameF = nameF.replace(">", "_")
-                    nameFile = nameFile.replace("<", "_")
-                    nameFile = nameFile.replace(">", "_")
                     f = open(nameDir+str(listForVenn.index(k))+'/'+nameFile+'.csv', 'w')
                 else:
                     f = open(nameDir+str(listForVenn.index(k))+'/intersectionOF'+str(len(key.split(',')))+'genes'+str(dictNumFile[len(key.split(','))])+'.csv', 'w')

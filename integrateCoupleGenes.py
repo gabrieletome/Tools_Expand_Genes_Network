@@ -309,8 +309,43 @@ def main():
                     pearson = [(dictConvert[[w for w in u.split('<BR>') if w in dictConvert.keys()][0]],dictConvert[[w for w in v.split('<BR>') if w in dictConvert.keys()][0]],p) for (u,v,p) in tmp]+[((list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(a)]),(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(c)]),1) for (a,b,c,d) in l[1:] if a == 'GT-001' or c == 'GT-001']
                     pearsonComplete.append(pearson)
                 else:
-                    listForPearson = [(a,c,d) for (a,b,c,d) in l[1:]]
-                    pearsonComplete.append(listForPearson)
+                    isoformToSearch = []
+                    edgesNodes = [(u[0], u[1]) for u in isoformInEdge]
+                    for c in listCouple:
+                        i = 0
+                        j = 1
+                        while i < len(c):
+                            while j < len(c):
+                                if (c[i], c[j]) in edgesNodes:
+                                    isoformToSearch.append((isoformInEdge[edgesNodes.index((c[i], c[j]))])[2:])
+                                if (c[j], c[i]) in edgesNodes:
+                                    isoformToSearch.append((isoformInEdge[edgesNodes.index((c[j], c[i]))])[2:])
+                                j += 1
+                            i += 1
+                            j = i+1
+
+                    isoformToSearch=[k.split('<-->') for k in [a[0] for a in isoformToSearch]]
+                    dictCouples={}
+                    for k in isoformToSearch:
+                        for i in [0,1]:
+                            if k[i].split('@')[1] in l[0] and k[i].split('@')[1] not in dictCouples.keys():
+                                dictCouples[k[i].split('@')[1]] = k[i].split('_')[0]
+                    listForPearson=[]
+                    for k in l[1:]:
+                        try:
+                            listForPearson.append((dictCouples[k[0]],(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k[2])]),k[3]))
+                        except:
+                            listForPearson.append((dictCouples[k[0]],dictCouples[k[2]],k[3]))
+
+                    # pearsonComplete.append(listForPearson)
+                    tmp=ut.pearsonCorrelation(listForPearson,'hgnc_cc_zero_filtered_mat.csv')
+                    pearson=[]
+                    for k in tmp:
+                        try:
+                            pearson.append(((list(dictCouples.keys())[list(dictCouples.values()).index(k[0])]),(list(dictCouples.keys())[list(dictCouples.values()).index(k[1])]),k[2]))
+                        except:
+                            pearson.append(((list(dictCouples.keys())[list(dictCouples.values()).index(k[0])]),listBioNameUpdate[k[1]],k[2]))
+                    pearsonComplete.append(pearson)
                     #TODO: calculate pearson correlation for human
                 print('Pearson Correlation done')
 
