@@ -538,7 +538,6 @@ def printVenn(listForVenn, couples, nameDir):
                 nameF = g.split('\'')[1]
             else:
                 nameF += '_'+g.split('\'')[1]
-
         #Draw venn diagram with 2 sets
         if len(couples[listForVenn.index(k)]) == 2:
             elemSubSets = (len(k[str(listKey[0])]), len(k[str(listKey[1])]), int(len(k[str(listKey[2])])/2))
@@ -623,7 +622,6 @@ def printVenn(listForVenn, couples, nameDir):
             nameUnifyGenes = nameUnifyGenes.replace(">", "_")
             plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
             print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
-
         #Draw Venn diagram with 5 sets
         if len(couples[listForVenn.index(k)]) == 5:
             #made all possible combination of genes
@@ -708,97 +706,101 @@ def printVenn(listForVenn, couples, nameDir):
 #Draw histogram graph of common genes
 def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEdge):
     for l in listCommonGenes:
-        listFrel = []
-        for k in l[0]:
-            listFrel.append([k])
-        i = 1
-        while i < len(l):
-            listFrel[[u[0] for u in listFrel].index(l[i][0])].append(l[i][3])
-            i += 1
-        frelOriginalFile = []
-        for name in [u[0] for u in listFiles]:
-            if isNotFantom:
-                if name in [u[0] for u in listFrel]:
-                    tmp = [name]
-                    for u in listFiles:
-                        if u[0] == name:
-                            tmp = tmp + [k[2] for k in u[1:]]
-                    frelOriginalFile.append(tmp)
+        #if len([a for a in l[1:] if a[0] not in l[0] or a[2] not in l[0]]) > 0:
+            listFrel = []
+            for k in l[0]:
+                listFrel.append([k])
+            i = 1
+            while i < len(l):
+                listFrel[[u[0] for u in listFrel].index(l[i][0])].append(l[i][3])
+                i += 1
+            if 1 not in [len(k) for k in listFrel]:
+                frelOriginalFile = []
+                for name in [u[0] for u in listFiles]:
+                    if isNotFantom:
+                        if name in [u[0] for u in listFrel]:
+                            tmp = [name]
+                            for u in listFiles:
+                                if u[0] == name:
+                                    tmp = tmp + [k[2] for k in u[1:]]
+                            frelOriginalFile.append(tmp)
+                    else:
+                        #find isoform we need to use
+                        edgesNodes = [(u[0], u[1]) for u in isoformInEdge]
+                        i = 0
+                        j = 1
+                        isoformToSearch = []
+                        numberEdgesBetweenGeneCouple = 0
+                        while i < len([u[0] for u in listFrel]):
+                            numberEdgesBetweenGeneCouple += len([u[0] for u in listFrel])-i-1
+                            while j < len([u[0] for u in listFrel]):
+                                if ([u[0] for u in listFrel][i], [u[0] for u in listFrel][j]) in edgesNodes:
+                                    isoformToSearch.append((isoformInEdge[edgesNodes.index(([u[0] for u in listFrel][i], [u[0] for u in listFrel][j]))])[2:])
+                                if ([u[0] for u in listFrel][j], [u[0] for u in listFrel][i]) in edgesNodes:
+                                    isoformToSearch.append((isoformInEdge[edgesNodes.index(([u[0] for u in listFrel][j], [u[0] for u in listFrel][i]))])[2:])
+                                j += 1
+                            i += 1
+                            j = i+1
+                        listNameIsoform = {}
+                        #save name isoform of lists in a dictionary to improve the performance
+                        for isoS in isoformToSearch:
+                            for n in isoS:
+                                tmpIsoform = n.split('<-->')
+                                for iso in tmpIsoform:
+                                    listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
+
+                        if (name.split('@'))[1] in [u[0] for u in listFrel] and (name.split('@'))[1] not in [u[0] for u in frelOriginalFile] and name in listNameIsoform:
+                            tmp = [(name.split('@'))[1]]
+                            for u in listFiles:
+                                if u[0] == name:
+                                    tmp = tmp + [k[2] for k in u[1:]]
+                            frelOriginalFile.append(tmp)
+                        elif (name.split('@'))[1] in [u[0] for u in listFrel] and (name.split('@'))[1] in [u[0] for u in frelOriginalFile] and name in listNameIsoform:
+                            tmp = frelOriginalFile[[u[0] for u in frelOriginalFile].index((name.split('@'))[1])]
+                            for u in listFiles:
+                                if u[0] == name:
+                                    tmp = tmp + [k[2] for k in u[1:]]
+                            frelOriginalFile[[u[0] for u in frelOriginalFile].index((name.split('@'))[1])] = tmp
+                listFrel = sorted(listFrel, key=ut.ord)
+                frelOriginalFile = sorted(frelOriginalFile, key=ut.ord)
+                #Prepare parameters to draw the histograms
+                num_rows = int((float(len(listFrel))-0.1)/2)+1
+                if num_rows == 1:
+                    num_rows+=1;
+                num_bins = 20
+                fig, axes = plt.subplots(num_rows, 2, tight_layout=True)
+
+                #Draw each histograms
+                counter = 0
+                for i in range(num_rows):
+                    for j in range(2):
+                        ax = axes[i][j]
+                        # Plot when we have data
+                        if counter < len(listFrel):
+                            #Draw histogram with linear axes
+                            ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, range=[0.0, 1.0], edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' analyzed genes'])
+                            # ax.hist(frelOriginalFile[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='green', alpha=0.5, label='{}'.format(listFrel[counter][0]))
+                            # ax.hist(listFrel[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='blue', alpha=0.5, label='{}'.format(listFrel[counter][0]))
+                            ax.set_xlabel('Frequency')
+                            ax.set_ylabel('Number genes')
+                            leg = ax.legend(loc='upper left')
+                            leg.draw_frame(False)
+                        # Remove axis when we no longer have data
+                        else:
+                            ax.set_axis_off()
+                        counter += 1
+
+                nameF = utex.buildNamefile(l)
+                #create dir for each couple of genes
+                nameDirGenes = nameDir+str(listCommonGenes.index(l))+'/'
+                # tmp = plt.gcf().get_size_inches()
+                plt.gcf().set_size_inches(15, 10)
+                nameF = nameF.replace("<", "_")
+                nameF = nameF.replace(">", "_")
+                plt.savefig(nameDirGenes+'histogram.png')
+                print('Create: \''+nameDirGenes+'histogram.png\'')
+                # plt.gcf().set_size_inches(tmp)
+                plt.clf()
+                plt.close()
             else:
-                #find isoform we need to use
-                edgesNodes = [(u[0], u[1]) for u in isoformInEdge]
-                i = 0
-                j = 1
-                isoformToSearch = []
-                numberEdgesBetweenGeneCouple = 0
-                while i < len([u[0] for u in listFrel]):
-                    numberEdgesBetweenGeneCouple += len([u[0] for u in listFrel])-i-1
-                    while j < len([u[0] for u in listFrel]):
-                        if ([u[0] for u in listFrel][i], [u[0] for u in listFrel][j]) in edgesNodes:
-                            isoformToSearch.append((isoformInEdge[edgesNodes.index(([u[0] for u in listFrel][i], [u[0] for u in listFrel][j]))])[2:])
-                        if ([u[0] for u in listFrel][j], [u[0] for u in listFrel][i]) in edgesNodes:
-                            isoformToSearch.append((isoformInEdge[edgesNodes.index(([u[0] for u in listFrel][j], [u[0] for u in listFrel][i]))])[2:])
-                        j += 1
-                    i += 1
-                    j = i+1
-                listNameIsoform = {}
-                #save name isoform of lists in a dictionary to improve the performance
-                for isoS in isoformToSearch:
-                    for n in isoS:
-                        tmpIsoform = n.split('<-->')
-                        for iso in tmpIsoform:
-                            listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
-
-                if (name.split('@'))[1] in [u[0] for u in listFrel] and (name.split('@'))[1] not in [u[0] for u in frelOriginalFile] and name in listNameIsoform:
-                    tmp = [(name.split('@'))[1]]
-                    for u in listFiles:
-                        if u[0] == name:
-                            tmp = tmp + [k[2] for k in u[1:]]
-                    frelOriginalFile.append(tmp)
-                elif (name.split('@'))[1] in [u[0] for u in listFrel] and (name.split('@'))[1] in [u[0] for u in frelOriginalFile] and name in listNameIsoform:
-                    tmp = frelOriginalFile[[u[0] for u in frelOriginalFile].index((name.split('@'))[1])]
-                    for u in listFiles:
-                        if u[0] == name:
-                            tmp = tmp + [k[2] for k in u[1:]]
-                    frelOriginalFile[[u[0] for u in frelOriginalFile].index((name.split('@'))[1])] = tmp
-        listFrel = sorted(listFrel, key=ut.ord)
-        frelOriginalFile = sorted(frelOriginalFile, key=ut.ord)
-        #Prepare parameters to draw the histograms
-        num_rows = int((float(len(listFrel))-0.1)/2)+1
-        if num_rows == 1:
-            num_rows+=1;
-        num_bins = 20
-        fig, axes = plt.subplots(num_rows, 2, tight_layout=True)
-
-        #Draw each histograms
-        counter = 0
-        for i in range(num_rows):
-            for j in range(2):
-                ax = axes[i][j]
-                # Plot when we have data
-                if counter < len(listFrel):
-                    #Draw histogram with linear axes
-                    ax.hist([frelOriginalFile[counter][1:], listFrel[counter][1:]], bins=num_bins, range=[0.0, 1.0], edgecolor='black', linewidth=1.2, color=['green', 'blue'], alpha=0.5, label=[str(listFrel[counter][0])+' original list', str(listFrel[counter][0])+' analyzed genes'])
-                    # ax.hist(frelOriginalFile[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='green', alpha=0.5, label='{}'.format(listFrel[counter][0]))
-                    # ax.hist(listFrel[counter][1:], bins=num_bins, density=True, edgecolor='black', linewidth=1.2, color='blue', alpha=0.5, label='{}'.format(listFrel[counter][0]))
-                    ax.set_xlabel('Frequency')
-                    ax.set_ylabel('Number genes')
-                    leg = ax.legend(loc='upper left')
-                    leg.draw_frame(False)
-                # Remove axis when we no longer have data
-                else:
-                    ax.set_axis_off()
-                counter += 1
-
-        nameF = utex.buildNamefile(l)
-        #create dir for each couple of genes
-        nameDirGenes = nameDir+str(listCommonGenes.index(l))+'/'
-        # tmp = plt.gcf().get_size_inches()
-        plt.gcf().set_size_inches(15, 10)
-        nameF = nameF.replace("<", "_")
-        nameF = nameF.replace(">", "_")
-        plt.savefig(nameDirGenes+'histogram.png')
-        print('Create: \''+nameDirGenes+'histogram.png\'')
-        # plt.gcf().set_size_inches(tmp)
-        plt.clf()
-        plt.close()
+                print('No histogram printable')

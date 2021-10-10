@@ -239,33 +239,6 @@ def main():
             #print CSV with genes share between every gene of LGN
             createDir()
             utex.printCSV(edgesGraph, listCommonGenes[1], nameDir, listBioNameUpdate)
-            #Draw the Venn diagram, Histogram
-            if printDiagram:
-                utex.printNumberVenn(listCommonGenes, nameDir)
-                graphic.printVenn(listCommonGenes[1], listCouple, nameDir)
-                if TCGAdb or vitis:
-                    textFiles = [utex.manageBR(u) for u in utex.readFilesGenes(cmd[0][1:], listCouple, [('-f',0.1)], vitis, TCGAdb, listBioNameUpdate)]
-                    if vitis:
-                        #upload name if is Vitis
-                        for l in textFiles:
-                            l[0] = listBioNameUpdate[l[0]]
-                            i = 1
-                            while i < len(l):
-                                try:
-                                    l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
-                                except:
-                                    pass
-                                i += 1
-                else:
-                    textFiles = utex.readFilesGenes(cmd[0][1:-1], listCouple, [('-f',0.1)], vitis, TCGAdb, listBioNameUpdate)
-                    #upload name
-                    for l in textFiles:
-                        l[0] = listBioNameUpdate[l[0]]
-                        i = 1
-                        while i < len(l):
-                            l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
-                            i += 1
-                graphic.printHistogram(edgesGraph, textFiles, nameDir, TCGAdb or vitis, isoformInEdge)
 
             pearsonComplete = []
             for l in edgesGraph:
@@ -343,6 +316,35 @@ def main():
 
             #Draw graph
             graphic.printCommonGraph(edgesGraph, pearsonComplete, 1-min_frel, nameDir, autoSaveImg, listBioNameUpdate)
+
+            #Draw the Venn diagram, Histogram
+            if printDiagram:
+                utex.printNumberVenn(listCommonGenes, nameDir)
+                graphic.printVenn(listCommonGenes[1], listCouple, nameDir)
+                if TCGAdb or vitis:
+                    textFiles = [utex.manageBR(u) for u in utex.readFilesGenes(cmd[0][1:], listCouple, [('-f',0.1)], vitis, TCGAdb, listBioNameUpdate)]
+                    if vitis:
+                        #upload name if is Vitis
+                        for l in textFiles:
+                            l[0] = listBioNameUpdate[l[0]]
+                            i = 1
+                            while i < len(l):
+                                try:
+                                    l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
+                                except:
+                                    pass
+                                i += 1
+                else:
+                    textFiles = utex.readFilesGenes(cmd[0][1:-1], listCouple, [('-f',0.1)], vitis, TCGAdb, listBioNameUpdate)
+                    #upload name
+                    for l in textFiles:
+                        l[0] = listBioNameUpdate[l[0]]
+                        i = 1
+                        while i < len(l):
+                            l[i] = (l[i][0], listBioNameUpdate[l[i][1]], l[i][2])
+                            i += 1
+                graphic.printHistogram(edgesGraph, textFiles, nameDir, TCGAdb or vitis, isoformInEdge)
+
         else:
             print('ERROR: wrong format')
             utex.printInfo()
