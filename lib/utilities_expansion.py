@@ -268,7 +268,7 @@ def printNumberVenn(listCommonGenes, nameDir):
         for key in listKey[:-1]:
             nameFile = ''
             for g in sorted(key.split('\'')):
-                if len(g) > 4:
+                if len(g) >= 2:
                     if nameFile == '':
                         nameFile = g
                     else:
@@ -430,77 +430,80 @@ def findCommonGenesFantom(couples, listFiles, isoformInEdge):
                 j += 1
             i += 1
             j = i+1
-        # if numberEdgesBetweenGeneCouple == len(isoformToSearch):
-        innerListGenes = [c]
-        innerListForVenn = {}
-        dictGeneToSave = {}
-        listNameIsoform = {}
-        #save name isoform of lists in a dictionary to improve the performance
-        for l in isoformToSearch:
-            for n in l:
-                tmpIsoform = n.split('<-->')
-                for iso in tmpIsoform:
-                    listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
-        for f in listFiles:
-            if f[0] in listNameIsoform:
-                for elem in f[1:]:
-                    nGene = elem[1]
-                    if (nGene.split('@'))[1] in c and (f[0].split('@'))[1] != (elem[1].split('@'))[1]:
-                        edgeBetweenGenesLGN.append(((f[0].split('@'))[1], elem[0], (elem[1].split('@'))[1], elem[2]))
-                    dictGeneToSave[nGene] = []
-                    for g in c:
-                        try:
-                            if nGene in ((listDictGenesFiles[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]])[1]).keys():
-                                dictGeneToSave[nGene] = dictGeneToSave[nGene]+[g]
-                        except:
-                            pass
-        #for key in dictGeneToSave.keys():
-        #create innerListForVenn[] for every possible combination of the genes in couples
-        keys = []
-        for g in c:
-            keys.append([g])
-        i = 0
-        j = 1
-        k = 0
-        while i < len(c):
-            while j < len(c):
-                tmpL = [c[i]]
+        if len(isoformToSearch) > 0:
+            # if numberEdgesBetweenGeneCouple == len(isoformToSearch):
+            innerListGenes = [c]
+            innerListForVenn = {}
+            dictGeneToSave = {}
+            listNameIsoform = {}
+            #save name isoform of lists in a dictionary to improve the performance
+            for l in isoformToSearch:
+                for n in l:
+                    tmpIsoform = n.split('<-->')
+                    for iso in tmpIsoform:
+                        listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
+            for f in listFiles:
+                if f[0] in listNameIsoform:
+                    for elem in f[1:]:
+                        nGene = elem[1]
+                        if (nGene.split('@'))[1] in c and (f[0].split('@'))[1] != (elem[1].split('@'))[1]:
+                            edgeBetweenGenesLGN.append(((f[0].split('@'))[1], elem[0], (elem[1].split('@'))[1], elem[2]))
+                        dictGeneToSave[nGene] = []
+                        for g in c:
+                            try:
+                                if nGene in ((listDictGenesFiles[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]])[1]).keys():
+                                    dictGeneToSave[nGene] = dictGeneToSave[nGene]+[g]
+                            except:
+                                pass
+            #for key in dictGeneToSave.keys():
+            #create innerListForVenn[] for every possible combination of the genes in couples
+            keys = []
+            for g in c:
+                keys.append([g])
+            i = 0
+            j = 1
+            k = 0
+            while i < len(c):
                 while j < len(c):
-                    tmpL.append(c[j])
-                    keys.append(tmpL.copy())
-                    j+=1
-                k+=1
-                j=i+1+k
-            i+=1
-            j=i+1
-        for k in keys:
-            innerListForVenn[str(sorted(k))] = []
-        edgeBetweenGenesLGN = manageDuplicates(edgeBetweenGenesLGN)
-        innerListGenes = innerListGenes+edgeBetweenGenesLGN
-        #Divide genes to the correct innerList
-        for key in dictGeneToSave.keys():
-            if len(dictGeneToSave[key]) == len(c):
-                for g in c:
-                    try:
-                        tmpCouple = listFiles[listDictGenesFiles[[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]][0]][0]][((listDictGenesFiles[[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]][0]])[1])[key]]
-                        innerListGenes.append((g, tmpCouple[0], tmpCouple[1], tmpCouple[2]))
-                        innerListForVenn[str(sorted(dictGeneToSave[key]))] += [(g, tmpCouple[0], tmpCouple[1], tmpCouple[2])]
-                    except:
-                        pass
-            #divide nodes for venn diagram
-            i = 1
-            while len(c)-i >= 0:
-                if len(dictGeneToSave[key]) == len(c)-i:
+                    tmpL = [c[i]]
+                    while j < len(c):
+                        tmpL.append(c[j])
+                        keys.append(tmpL.copy())
+                        j+=1
+                    k+=1
+                    j=i+1+k
+                i+=1
+                j=i+1
+            for k in keys:
+                innerListForVenn[str(sorted(k))] = []
+            edgeBetweenGenesLGN = manageDuplicates(edgeBetweenGenesLGN)
+            innerListGenes = innerListGenes+edgeBetweenGenesLGN
+            #Divide genes to the correct innerList
+            for key in dictGeneToSave.keys():
+                if len(dictGeneToSave[key]) == len(c):
                     for g in c:
                         try:
                             tmpCouple = listFiles[listDictGenesFiles[[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]][0]][0]][((listDictGenesFiles[[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]][0]])[1])[key]]
+                            innerListGenes.append((g, tmpCouple[0], tmpCouple[1], tmpCouple[2]))
                             innerListForVenn[str(sorted(dictGeneToSave[key]))] += [(g, tmpCouple[0], tmpCouple[1], tmpCouple[2])]
                         except:
                             pass
-                i+=1
-        listForVenn.append(innerListForVenn)
-        innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord2)
-        listCommonGenes.append(innerListGenes)
+                #divide nodes for venn diagram
+                i = 1
+                while len(c)-i >= 0:
+                    if len(dictGeneToSave[key]) == len(c)-i:
+                        for g in c:
+                            try:
+                                tmpCouple = listFiles[listDictGenesFiles[[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]][0]][0]][((listDictGenesFiles[[list(listNameIsoform.keys())[list(listNameIsoform.values()).index(g)]][0]])[1])[key]]
+                                innerListForVenn[str(sorted(dictGeneToSave[key]))] += [(g, tmpCouple[0], tmpCouple[1], tmpCouple[2])]
+                            except:
+                                pass
+                    i+=1
+            listForVenn.append(innerListForVenn)
+            innerListGenes = [innerListGenes[0]]+sorted(innerListGenes[1:], key=ord2)
+            listCommonGenes.append(innerListGenes)
+        else:
+            print('No edge detected between '+str(c))
     return (listCommonGenes, listForVenn)
 
 #Build Edges for frel and rank
@@ -620,7 +623,7 @@ def printCSV(edgesGraph, listForVenn, nameDir,listBioNameUpdate):
                 if len(key.split(',')) == 1:
                     nameFile = ''
                     for g in sorted(key.split('\'')):
-                        if len(g) > 4:
+                        if len(g) >= 2:
                             if nameFile == '':
                                 nameFile = g
                             else:
