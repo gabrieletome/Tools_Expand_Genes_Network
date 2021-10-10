@@ -539,7 +539,7 @@ def printVenn(listForVenn, couples, nameDir):
             else:
                 nameF += '_'+g.split('\'')[1]
         #Draw venn diagram with 2 sets
-        if len(couples[listForVenn.index(k)]) == 2:
+        if len([elem.split('\'')[1] for elem in list(k.keys()) if len(elem.split('\''))==3]) == 2:
             elemSubSets = (len(k[str(listKey[0])]), len(k[str(listKey[1])]), int(len(k[str(listKey[2])])/2))
             v = venn2(subsets = elemSubSets, set_labels = ((re.findall(r'\w+', str(listKey[0])))[0], (re.findall(r'\w+', str(listKey[1])))[0]))
             nameUnifyGenes = (re.findall(r'\w+', str(listKey[0])))[0] +'_'+ (re.findall(r'\w+', str(listKey[1])))[0]
@@ -550,7 +550,7 @@ def printVenn(listForVenn, couples, nameDir):
             plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
             print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
         #Draw venn diagram with 3 sets
-        if len(couples[listForVenn.index(k)]) == 3:
+        if len([elem.split('\'')[1] for elem in list(k.keys()) if len(elem.split('\''))==3]) == 3:
             elemSubSets = ('',)
             if len(listKey) == 7:
                 listKey = sorted(listKey[:3])+sorted(listKey[3:-1], key=itemgetter(0,1))+[listKey[-1]]
@@ -568,7 +568,7 @@ def printVenn(listForVenn, couples, nameDir):
             plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
             print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
         #Draw Venn diagram with 4 sets
-        if len(couples[listForVenn.index(k)]) == 4:
+        if len([elem.split('\'')[1] for elem in list(k.keys()) if len(elem.split('\''))==3]) == 4:
             #made all possible combination of genes
             listKey = sorted([str([elem]) for elem in couples[listForVenn.index(k)]])
             listKeyL = sorted([[elem] for elem in couples[listForVenn.index(k)]])
@@ -623,7 +623,7 @@ def printVenn(listForVenn, couples, nameDir):
             plt.savefig(nameDir+str(listForVenn.index(k))+'/venn.png')
             print('Create: \''+str(listForVenn.index(k))+'/venn.png\'')
         #Draw Venn diagram with 5 sets
-        if len(couples[listForVenn.index(k)]) == 5:
+        if len([elem.split('\'')[1] for elem in list(k.keys()) if len(elem.split('\''))==3]) == 5:
             #made all possible combination of genes
             listKey = sorted([str([elem]) for elem in couples[listForVenn.index(k)]])
             listKeyL = sorted([[elem] for elem in couples[listForVenn.index(k)]])
