@@ -53,7 +53,7 @@
    Install DREME: [DREME tool](http://meme-suite.org/doc/download.html)
 
 ## TOOL 1: *managerList.py*
-Tool used to build the complete graph of interaction and find the LGN.
+Tool used to build the complete graph of interaction and find the LGN. In the human case study based on FANTOM we suggest to use all the isoforms of the genes for a complete analysis.
 How to use:
 ```
 Usage: python3 managerList.py PARAM [FILTERS]... -files [FILES]...
