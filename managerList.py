@@ -47,6 +47,7 @@ def main():
             graphGenesOld = []
             if matrixGenes[2]:
                 graphGenesOld = ut.manageDuplicates(ut.buildGraph(matrixGenes[1]))
+                graphGenes = human.filterEdgeByCorrectIsoform(graphGenes, graphGenesOld)
             print('Build graph successufully', flush=True)
             #find core of graphGenes
             print("Searching core network...", flush=True)

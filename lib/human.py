@@ -257,6 +257,19 @@ def indexDictGene(g, listStr):
             listIndex.append(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(elem)])
     return listIndex
 
+#Filter edge graph by the correct idsoforms of the files
+def filterEdgeByCorrectIsoform(graphGenes, graphGenesOld):
+    edges=[]
+    listEdgesOriginalGraph = [(a,b) for (a,b,c) in graphGenesOld]
+    for e in graphGenes:
+        listIndex1 = indexDictGene(e[0], listBioNameUpdate.values())
+        listIndex2 = indexDictGene(e[1], listBioNameUpdate.values())
+        for k in [(a, b) for a in listIndex1 for b in listIndex2]:
+            if k in listEdgesOriginalGraph:
+                edges.append(e)
+    return edges
+
+
 #Print in output the graphs
 def printOutput(coreGraph, graphGenes, graphGenesOld):
     if not os.path.exists('networkOutput'):
