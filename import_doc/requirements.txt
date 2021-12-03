@@ -1,0 +1,9 @@
+datetime
+pandas
+rpy2
+matplotlib
+matplotlib-venn
+networkx
+numpy
+scipy
+rectangle-packer
