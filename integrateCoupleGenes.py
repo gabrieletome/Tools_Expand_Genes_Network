@@ -316,38 +316,52 @@ def main():
                         j = 1
                         while i < len(c):
                             while j < len(c):
+                                added=False
                                 if (c[i], c[j]) in edgesNodes:
                                     isoformToSearch.append((isoformInEdge[edgesNodes.index((c[i], c[j]))])[2:])
+                                    added=True
                                 if (c[j], c[i]) in edgesNodes:
                                     isoformToSearch.append((isoformInEdge[edgesNodes.index((c[j], c[i]))])[2:])
+                                    added=True
+                                if (c[j], c[i]) not in edgesNodes and added!=True:
+                                    tmp=''
+                                    for gene in [c[j],c[i]]:
+                                        for k in [l[0] for l in listFiles]:
+                                            if k.split('@')[1] in [c[j], c[i]]:
+                                                if tmp == '':
+                                                    tmp = k
+                                                else:
+                                                    tmp= tmp+'<-->'+k
+                                    isoformToSearch.append([tmp])
                                 j += 1
                             i += 1
                             j = i+1
-
                     isoformToSearch=[k.split('<-->') for k in [a[0] for a in isoformToSearch]]
                     dictCouples={}
                     for k in isoformToSearch:
-                        for i in [0,1]:
+                        for i in range(0,len(k)):
                             if k[i].split('@')[1] in l[0] and k[i].split('@')[1] not in dictCouples.keys():
-                                dictCouples[k[i].split('@')[1]] = k[i].split('_')[0]
+                                dictCouples[k[i].split('@')[1]] = [k[i].split('_')[0]]
+                            elif k[i].split('@')[1] in l[0] and k[i].split('@')[1] in dictCouples.keys():
+                                (dictCouples[k[i].split('@')[1]]).append(k[i].split('_')[0])
                     listForPearson=[]
                     for k in l[1:]:
-                        try:
-                            listForPearson.append((dictCouples[k[0]],(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k[2])]),k[3]))
-                        except:
-                            listForPearson.append((dictCouples[k[0]],dictCouples[k[2]],k[3]))
+                        for elem in dictCouples[k[0]]:
+                            try:
+                                listForPearson.append((elem,(list(listBioNameUpdate.keys())[list(listBioNameUpdate.values()).index(k[2])]),k[3]))
+                            except:
+                                listForPearson.append((elem,dictCouples[k[2]][0],k[3]))
 
                     # pearsonComplete.append(listForPearson)
                     tmp=ut.pearsonCorrelation(listForPearson,'hgnc_cc_zero_filtered_mat.csv')
                     pearson=[]
                     for k in tmp:
                         try:
-                            pearson.append(((list(dictCouples.keys())[list(dictCouples.values()).index(k[0])]),(list(dictCouples.keys())[list(dictCouples.values()).index(k[1])]),k[2]))
+                            pearson.append(((list(dictCouples.keys())[list(dictCouples.values()).index([l for l in list(dictCouples.values()) if k[0] in l][0])]),(list(dictCouples.keys())[list(dictCouples.values()).index(k[1])]),k[2]))
                         except:
-                            pearson.append(((list(dictCouples.keys())[list(dictCouples.values()).index(k[0])]),listBioNameUpdate[k[1]],k[2]))
+                            pearson.append(((list(dictCouples.keys())[list(dictCouples.values()).index([l for l in list(dictCouples.values()) if k[0] in l][0])]),listBioNameUpdate[k[1]],k[2]))
                     pearsonComplete.append(pearson)
-                    #TODO: calculate pearson correlation for human
-                print('Pearson Correlation done')
+                    print('Pearson Correlation done')
 
             #Draw graph
             graphic.printCommonGraph(edgesGraph, pearsonComplete, 1-min_frel, nameDir, autoSaveImg, listBioNameUpdate)

@@ -748,7 +748,9 @@ def printHistogram(listCommonGenes, listFiles, nameDir, isNotFantom, isoformInEd
                                 tmpIsoform = n.split('<-->')
                                 for iso in tmpIsoform:
                                     listNameIsoform[iso] = ((re.search(r'@\w*', iso)).group())[1:]
-
+                        if len(listNameIsoform)==0:
+                            if name.split('@')[1] in [u[0] for u in listFrel]:
+                                listNameIsoform[name]=name.split('@')[1]
                         if (name.split('@'))[1] in [u[0] for u in listFrel] and (name.split('@'))[1] not in [u[0] for u in frelOriginalFile] and name in listNameIsoform:
                             tmp = [(name.split('@'))[1]]
                             for u in listFiles:
