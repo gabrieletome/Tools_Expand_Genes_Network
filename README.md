@@ -9,9 +9,9 @@
    ./setup.sh
   ```
 
-  In directory 'import_doc' is present the file 'vv_exprdata_2.csv'.  It is a large file uploaded with Git LFS that generate a pointer to the real file. To have the correct version of the file you need to:
+  In directory 'import_doc' are present the files 'vv_exprdata_2.csv', 'hgnc_cc_zero_filtered_mat.csv' and 'tcga_prad_mat_z.csv'.  They are large files uploaded with Git LFS that generate a pointer to the real file. To have the correct version of the file you need to:
    - download the repository with Git LFS, or,
-   - get the file at this link (<!--insert link-->) and substitute to the file in 'import_doc' obtained with git clone.
+   - get the file at this link [vv_exprdata_2.csv](https://drive.google.com/file/d/1eM3vYJH5kK1Z6M2WURLZ-2rpudYsA3Dd/view?usp=drivesdk), [hgnc_cc_zero_filtered_mat.csv](https://drive.google.com/file/d/14pGrVIsuR1US-iIpyg_8a_fC2Y6K3pdX/view?usp=share_link), [tcga_prad_mat_z.csv](https://drive.google.com/file/d/1y5KwFCb6JQ-_SFId4yZuoCTKy9Tzvz8V/view?usp=share_link) and substitute to the file in 'import_doc' obtained with git clone.
 <!-- Python 3
  Library of Python (install with pip3):
    * *datetime*
